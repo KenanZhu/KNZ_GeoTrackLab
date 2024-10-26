@@ -36,48 +36,59 @@ Features ：
   
 ## Project Update
 
-#### Big Update: 2024/10/26
-1. Full gui
-2. Integrated KNZ_Calculate and KNZ_Plot.
-3. Rename the project as GeoTrackLab after the integrate.
-4. Realized GPS, BeiDou, Galileo, GLONASS satellite position calculation.
-5. New module added: 3D satellite orbit display.
+Rename the Project & Update: 2024/10/26
+1.	First release KNZ_GeoTrackLab.
+2.	KNZ_Calculate: Merged with KNZ_Plot.
+3.	KNZ_Plot: Merged with KNZ_Calculate.
+4.	KNZ_GeoTrackLab: Support GPS & BeiDou & Galileo & GLONASS.
 
-#### Update: 2024/10/14
-1. KNZ_Calculate: be able to calculate the sat pos of GPS & BDS & Galileo.
-2. KNZ_Plot: be able to Single postiting by GPS & Galileo.
+Update: 2024/10/14
+1.	KNZ_Calculate: Support GPS & BDS & Galileo.
+2.	KNZ_Plot: Support GPS & Galileo.
 
-#### Update: 2024/10/09
-1. KNZ_Calculate: modified some mistake and optimize the use experience.
-2. KNZ_Plot: more selective options and more united style of GUI.
+Update: 2024/10/09
+1.	KNZ_Calculate: Modify some crash.
+2.	KNZ_Calculate: Optimize use experience.
+3.	KNZ_Plot: Modify UI..
 
-#### Rename the Project: 2024/10/08
-1. Update KNZ_Plot.
-2. Update more GUI parts.
+Rename the Project & Update: 2024/10/08
+1.	First release KNZ_Plot ,KNZ_Calculate.
+2.	KNZ_Plot: Modify UI.
+3.	KNZ_Calculate: Modify UI. 
 
-#### Update: 2024/10/06
-1. SPP_Plot: Realize the file view function.
-2. SPP_Plot: Realize the color select Optimized operation experience.
+Update: 2024/10/06
+1.	SPP_Plot: Fix some bug.
+2.	SPP_Plot: Optimize use experience.
+3.	SPP_Calculate: Optimize code structure.
+4.	SPP_Calculate: Modify UI.
 
-#### Big Update: 2024/10/05
-1. Realize the full gui program.
-2. Complete the plot function.
+Update: 2024/10/05
+1.	First release SPP_Plot
+2.	SPP_Calculate: Modify UI.
 
-#### Update: 2024/09/28
-1. Implement GUI by WIN32 API.
-2. Optimize code structure.
+Update: 2024/09/28
+1.	First release SPP_Calculate.
+2.	Optimize code structure.
 
-#### Update: 2024/09/26
-1. Fix some bug.
-2. Optimize code structure.
+Update: 2024/09/26
+1.	Fix some bug.
+2.	Optimize use experience.
 
-#### Update: 2024/09/23
-1. Modify some crash.
-2. Fix some bug.
+Update: 2024/09/23
+1.	Fix some bug.
+2.	Modify some crash.
 
-#### Update: 2024/09/22
-1. Modify UI.
-2. Fix some bug.
+Update: 2024/09/22
+1.	Fix some bug.
+2.	Modify UI.
+
+Update: 2024/09/21
+1.	Fix some bug.
+2.	Optimize use experience.
+
+Update: 2024/09/20
+1.	First release.
+
 
 #### Big Update: 2024/09/21
 1. Correct some mistake.
