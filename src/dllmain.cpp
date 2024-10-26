@@ -1408,9 +1408,8 @@ double Start(char nav_path[260], char obs_path[260], char res_path[260], int gns
 								gnsscode, satnum);
 			fprintf(result_file, "\n");
 		}
-		freeobs_e(obs_e, obs_b);
-		fprintf(result_file, "\nEND"); 
-		fclose(result_file);
+		freeobs_e(obs_e, obs_b); free(obs_h); free(nav_h); free(nav_b);
+		fprintf(result_file, "\nEND"); fclose(result_file);
 		return epochunum - result;
 	}
 }
