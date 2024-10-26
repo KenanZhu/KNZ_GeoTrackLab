@@ -17,7 +17,7 @@
 #define math_e  2.718281828459
 #define PI      3.141592653589793
 #define Earth_e 7.2921151467e-5
-#define C20		1.0826257e-3
+#define C20	1.0826257e-3
 
 /* ------------------------------ WGS-84 CONST ------------------------------ */
 #define a       6378137.0
@@ -27,11 +27,11 @@
 #define TSTEP	30.0
 /* ----------------------------- GNSS OBSERV TYPE --------------------------- */
 //frequency 1
-#define C1		100
+#define C1	100
 #define C1A     100
 #define C1B     101
 #define C1C     102
-#define C1D		103
+#define C1D	103
 #define C1E
 #define C1F
 #define C1G
@@ -39,24 +39,24 @@
 #define C1I
 #define C1J
 #define C1K
-#define C1L		104
-#define C1M		105
+#define C1L	104
+#define C1M	105
 #define C1N
 #define C1O
-#define C1P		106
+#define C1P	106
 #define C1Q
 #define C1R
-#define C1S		107
+#define C1S	107
 #define C1T
 #define C1U
 #define C1V
 #define C1W
-#define C1X		108
-#define C1Y		109
-#define C1Z		110
+#define C1X	108
+#define C1Y	109
+#define C1Z	110
 
 //frequency 2
-#define C2		200
+#define C2	200
 #define C2A
 #define C2B
 #define C2C     200
@@ -65,7 +65,7 @@
 #define C2F
 #define C2G
 #define C2H
-#define C2I		202
+#define C2I	202
 #define C2J
 #define C2K
 #define C2L     203
@@ -80,24 +80,24 @@
 #define C2U
 #define C2V
 #define C2W
-#define C2X		208
+#define C2X	208
 #define C2Y     209
 #define C2Z     210
 
 //frequency 3
 #define C3      300
-#define C3I		300
-#define C3Q		301
-#define C3X		302
+#define C3I	300
+#define C3Q	301
+#define C3X	302
 
 //frequency 4
-#define C4		400
-#define C4A		400
-#define C4B		401
-#define C4X		402
+#define C4	400
+#define C4A	400
+#define C4B	401
+#define C4X	402
 
 //frequency 5
-#define C5		500
+#define C5	500
 #define C5A
 #define C5B
 #define C5C
@@ -126,10 +126,10 @@
 #define C5Z
 
 //frequency 6
-#define C6		600
-#define C6A		600
-#define C6B		601
-#define C6C		602
+#define C6	600
+#define C6A	600
+#define C6B	601
+#define C6C	602
 #define C6D
 #define C6E
 #define C6F
@@ -150,12 +150,12 @@
 #define C6U
 #define C6V
 #define C6W
-#define C6X		603
+#define C6X	603
 #define C6Y
-#define C6Z		604
+#define C6Z	604
 
 //frequency 7
-#define C7		700
+#define C7	700
 #define C7A
 #define C7B
 #define C7C
@@ -164,7 +164,7 @@
 #define C7F
 #define C7G
 #define C7H
-#define C7I		700
+#define C7I	700
 #define C7J
 #define C7K
 #define C7L
@@ -172,29 +172,29 @@
 #define C7N
 #define C7O
 #define C7P
-#define C7Q		701
+#define C7Q	701
 #define C7R
 #define C7S
 #define C7T
 #define C7U
 #define C7V
 #define C7W
-#define C7X		702
+#define C7X	702
 #define C7Y
 #define C7Z
 
 //frequency 8
-#define	C8		800
-#define C8I		800
-#define C8Q		801
-#define C8X		802
+#define	C8	800
+#define C8I	800
+#define C8Q	801
+#define C8X	802
 
 /* ------------------------------- GNSS CODE -------------------------------- */
-#define GPS		 01
-#define BDS		 02
-#define GAL		 03
-#define GLO		 04
-#define SBAS	 05
+#define GPS	01
+#define BDS	02
+#define GAL	03
+#define GLO	04
+#define SBAS	05
 
 /* ------------------------------ FOR CALMOD.H ------------------------------ */
 #define MAXRINEX 1000
@@ -248,7 +248,7 @@ typedef struct
 	double N;
 	double U;
 }blh2enu;
-
+//longitude & latitude structure
 typedef struct
 {
 	double B;
@@ -290,22 +290,22 @@ typedef struct nav_body
 	int TOC_Sec;
 	double sa0;
 	double sa1;
-	double sa2;										double Dos;
+	double sa2;					double Dos;
 
-	double IODE;	double AODE;					double SatX;
-	double Crs;										double SatXv;
-	double deltan;									double SatXa;
+	double IODE;	double AODE;			double SatX;
+	double Crs;					double SatXv;
+	double deltan;					double SatXa;
 	double M0;
 
-	double Cuc;										double SatY;
-	double e;										double SatYv;
-	double Cus;										double SatYa;
-	double sqrtA;									int FreN;
+	double Cuc;					double SatY;
+	double e;					double SatYv;
+	double Cus;					double SatYa;
+	double sqrtA;					int FreN;
 
-	double TOE;										double SatZ;
-	double Cic;										double SatZv;
-	double OMEGA;									double SatZa;
-	double Cis;										int AOO;
+	double TOE;					double SatZ;
+	double Cic;					double SatZv;
+	double OMEGA;					double SatZa;
+	double Cis;					int AOO;
 
 	double i0;
 	double Crc;
@@ -313,17 +313,17 @@ typedef struct nav_body
 	double deltaomega;
 
 	double IDOT;
-	double L2code;				    int Datasource;
+	double L2code;			int Datasource;
 	double GPSweek; double BDTweek; double GALweek;
 	double L2Pflag;
 
 	double sACC;
 	double sHEA;
-	double TGD;		double TGD1;	double BGDa;
+	double TGD;	double TGD1;	double BGDa;
 	double IODC;	double TGD2;	double BGDb;
 
 	double TTN;
-	double fit;		double AODC;
+	double fit;	double AODC;
 	double spare1;
 	double spare2;
 
