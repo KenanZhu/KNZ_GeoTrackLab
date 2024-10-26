@@ -666,7 +666,7 @@ class MAINGUI:
             with open(o_path, 'w+') as of:  # Initialize-------#
                 of.close()
             of = open(o_path, 'a+')
-            print("@ GENERATE PROGRAM   : KNZ_SN Visual Lab v1.5.1\n"
+            print("@ GENERATE PROGRAM   : KNZ_GeoTrackLab ver1.5.1\n"
                   "@ GENERATE TYPE      : Receiver Station Position\n"
                   "@ GENERATE TIME      : %s\n"
                   "@ GENERATE SYS       : %s\n"
