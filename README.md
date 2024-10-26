@@ -89,22 +89,6 @@ Update: 2024/09/21
 Update: 2024/09/20
 1.	First release.
 
-
-#### Big Update: 2024/09/21
-1. Correct some mistake.
-2. Optimize code structure.
-3. Improve the function and operation logic of software input and output.
-4. Adding and modify many useful function in their header file:
--blh2enu.h
--xyz2blh.h
--rahcal.h
--deg2dms.h
--degRrad.h
-
-#### Update: 2024/09/20
-1. Correct some mistake.
-2. Optimize code structure.
-
 ## Project notice
 * When writing the code, with the help of the existing open source code results, and different degrees of reference, here one by one mark and express thanks:  
 
