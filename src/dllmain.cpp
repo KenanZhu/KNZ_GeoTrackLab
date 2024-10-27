@@ -283,7 +283,7 @@ int Type2Code(int i, char buff[1000])
 			strncpy(code_contrast, L3codeindex + 0 + j * 3, 3);
 			strncpy(code_original, buff + 7 + 4 * i, 3);
 			if (strcmp(code_contrast, code_original) == 0){
-				code_return = j + 500;
+				code_return = j + 300;
 				return code_return;
 				break;
 			}
@@ -294,7 +294,7 @@ int Type2Code(int i, char buff[1000])
 			strncpy(code_contrast, L3codeindex + 0 + j * 3, 3);
 			strncpy(code_original, buff + 7 + 4 * i, 3);
 			if (strcmp(code_contrast, code_original) == 0){
-				code_return = j + 500;
+				code_return = j + 400;
 				return code_return;
 				break;
 			}
