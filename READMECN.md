@@ -24,15 +24,15 @@
 ## 程序介绍
 ### 关于KNZ_GeoTrackLab
 * 2024年10月24日新增，由KNZ_Calculate与KNZ_Plot合并而成，改进运算逻辑，优化界面显示。
-* 阅读更多帮助文档
+* 阅读帮助文档了解更多
 ### 关于 KNZ_Calculate（停止）（与 KNZ_Plot 合并）
 * 自 2024 年 10 月 24 日起，KNZ_Calculate 已与 KNZ_Plot 合并为 KNZ_GeoTrackLab。[ADIN 2024/10/26]
 ### 关于 KNZ_Plot（停止）（与 KNZ_Calculate 合并）
-* 自 2024 年 10 月 5 日起，KNZ_Calculate 已与 KNZ_Plot 合并为 KNZ_GeoTrackLab。[ADIN 2024/10/26]
+* 自 2024 年 10 月 24 日起，KNZ_Calculate 已与 KNZ_Plot 合并为 KNZ_GeoTrackLab。[ADIN 2024/10/26]
 ### 关于 PyGMT（停止）
 * 自 2024 年 10 月 5 日起，PyGMT 项目将不再考虑。[ADIN 2024/10/5]
 ### 关于 Matlab（停止）
-* 自 2024 年 10 月 5 日起，Matlab 项目将不再已考虑。[ADIN 2024/10/5]
+* 自 2024 年 10 月 5 日起，Matlab 项目将不再考虑。[ADIN 2024/10/5]
 
 ## 项目更新
 
