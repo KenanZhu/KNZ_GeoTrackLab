@@ -24,9 +24,9 @@
 /*GNSS OBSERV TYPE*/
 //frequency 1
 #define C1		100
-#define C1A     100
-#define C1B     101
-#define C1C     102
+#define C1A		100
+#define C1B		101
+#define C1C		102
 #define C1D		103
 #define C1E
 #define C1F
@@ -54,8 +54,8 @@
 #define C2		200
 #define C2A
 #define C2B
-#define C2C     200
-#define C2D     201
+#define C2C		200
+#define C2D		201
 #define C2E
 #define C2F
 #define C2G
@@ -63,23 +63,23 @@
 #define C2I		202
 #define C2J
 #define C2K
-#define C2L     203
-#define C2M     204
+#define C2L		203
+#define C2M		204
 #define C2N
 #define C2O
-#define C2P     205
-#define C2Q     206
+#define C2P		205
+#define C2Q		206
 #define C2R
-#define C2S     207
+#define C2S		207
 #define C2T
 #define C2U
 #define C2V
 #define C2W
 #define C2X		208
-#define C2Y     209
-#define C2Z     210
+#define C2Y		209
+#define C2Z		210
 //frequency 3
-#define C3      300
+#define C3		300
 #define C3I		300
 #define C3Q		301
 #define C3X		302
@@ -98,7 +98,7 @@
 #define C5F
 #define C5G
 #define C5H
-#define C5I     500
+#define C5I		500
 #define C5J
 #define C5K
 #define C5L
@@ -106,14 +106,14 @@
 #define C5N
 #define C5O
 #define C5P
-#define C5Q     501
+#define C5Q		501
 #define C5R
 #define C5S
 #define C5T
 #define C5U
 #define C5V
 #define C5W
-#define C5X     502
+#define C5X		502
 #define C5Y
 #define C5Z
 //frequency 6
@@ -178,11 +178,11 @@
 #define C8Q		801
 #define C8X		802
 /*GNSS CODE*/
-#define GPS		 01
-#define BDS		 02
-#define GAL		 03
-#define GLO		 04
-#define SBAS	 05
+#define GPS		01
+#define BDS		02
+#define GAL		03
+#define GLO		04
+#define SBAS	05
 
 #define MAXRINEX 1000
 #define DAYSEC	 86400
@@ -298,8 +298,8 @@ typedef struct nav_body
 	double deltaomega;
 
 	double IDOT;
-	double L2code;				    int Datasource;
-	double GPSweek; double BDTweek; double GALweek;
+	double L2code;					int Datasource;
+	double GPSweek;	double BDTweek;	double GALweek;
 	double L2Pflag;
 
 	double sACC;

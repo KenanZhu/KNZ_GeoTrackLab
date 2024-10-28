@@ -218,12 +218,6 @@ static double strtonum(const char* buff, int i, int n)
 	*p = '\0';
 	return sscanf(str, "%lf", &value) == 1 ? value : 0.0;
 }
-/*Allocate the memory of observation structure*/
-void initobs_e(pobs_epoch obs_e, pobs_body obs_b)
-{
-	obs_e = (pobs_epoch)malloc(sizeof(obs_epoch));
-	obs_b = (pobs_body)malloc(sizeof(obs_body));
-}
 /*Free the memory of observation structure*/
 void freeobs_e(pobs_epoch obs_e, pobs_body obs_b)
 {
@@ -664,7 +658,7 @@ void read_o_h(FILE* fp_obs, pobs_head obs_h)
 				obs_h->obstypenum_gps = (int)strtonum(buff, 4, 2);
 				if (obs_h->obstypenum_gps <= 13) {
 					for (i = 0; i < obs_h->obstypenum_gps; i++) {
-						obs_h->obscode_gps[i + 1] = Type2Code(i, buff);
+						obs_h->obscode_gps[i] = Type2Code(i, buff);
 					}
 				}
 				else if (obs_h->obstypenum_gps > 13) {
@@ -760,7 +754,6 @@ void read_o_h(FILE* fp_obs, pobs_head obs_h)
 /*Read the body data of file of obs*/
 void read_o_eb(FILE* fp_obs, pobs_head obs_h, pobs_epoch obs_e, pobs_body obs_b)
 {
-	initobs_e(obs_e, obs_b);
 	char buff[MAXRINEX] = { 0 };
 	char flag = { 0 };
 	while (fgets(buff, MAXRINEX, fp_obs)) {

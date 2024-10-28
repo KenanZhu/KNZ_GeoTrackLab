@@ -368,9 +368,7 @@ double brdm2pos(char nav_path[260], char obs_path[260], char res_path[260], int 
 
 	rewind(fp_obs);
 	obs_h = (pobs_head)malloc(sizeof(obs_head));
-	obs_e = (pobs_epoch)malloc(sizeof(obs_epoch));
-	obs_b = (pobs_body)malloc(sizeof(obs_body));
-	if (obs_h && obs_e && obs_b) {
+	if (obs_h) {
 		read_o_h(fp_obs, obs_h);
 
 		tem2 = XYZ2BLH(tem2, obs_h->apX, obs_h->apY, obs_h->apZ);
@@ -396,14 +394,18 @@ double brdm2pos(char nav_path[260], char obs_path[260], char res_path[260], int 
 
 		//Begin to calculate
 		for (int i = 0; i < epochunum; i++) {
+			//Allocate memory for obs epoch and body data
+			obs_e = (pobs_epoch)malloc(sizeof(obs_epoch));
+			obs_b = (pobs_body)malloc(sizeof(obs_body));
+
 			read_o_eb(fp_obs, obs_h, obs_e, obs_b);
 			result += sat_pos_cal(obs_h, obs_e, obs_b, nav_b,
 				result_file, station,
 				gnsscode, satnum);
-			fprintf(result_file, "\n");
-		}
 
-		freeobs_e(obs_e, obs_b);
+			fprintf(result_file, "\n");
+			freeobs_e(obs_e, obs_b);
+		}
 		free(obs_h); free(nav_h); free(nav_b);
 		fprintf(result_file, "\nEND"); fclose(result_file);
 		if (epochunum == result) return 0;
