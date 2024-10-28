@@ -36,6 +36,10 @@ Features ：
   
 ## Project Update
 
+Update: 2024/10/28
+1.  KNZ_GeoTrackLab: Fix some bug.
+2.  KNZ_GeoTrackLab: Optimize code structure.
+
 Rename the Project & Update: 2024/10/26
 1.	First release KNZ_GeoTrackLab.
 2.	KNZ_Calculate: Merged with KNZ_Plot.

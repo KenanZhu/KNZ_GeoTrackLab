@@ -22,8 +22,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 
-dll = cdll.LoadLibrary('./brdm2pos.dll')
-dll.Start.restype = c_double
 #
 #
 #
@@ -46,8 +44,13 @@ satsysdict = {1: "G", 4:"R", 2:"C", 3:"E", 5:"S"}
 satellite_system = 1
 ##Combox Count-er
 ComboxObsCount = 0
+Obsvalue = ('',)
 ComboxNavCount = 0
+Navvalue = ('',)
 ComboxOutCount = 0
+Outvalue = ('',)
+#
+version = 'ver 1.5.3.1'
 #
 #
 #
@@ -68,7 +71,7 @@ def Abo_windows():
     abo.minsize(200, 100)
     abo.maxsize(200, 100)
 
-    About = tk.Label(abo, text="\nKNZ_GeoTrackLab ver1.5.1\n\nCopyright (c) 2024 by KenanZhu\nAll Right Reserved.")
+    About = tk.Label(abo, text="\nKNZ_GeoTrackLab %s\n\nCopyright (c) 2024 by KenanZhu\nAll Right Reserved."%version)
     About.pack(side=tk.TOP, expand=tk.YES)
 
 class FUNCTION:
@@ -204,10 +207,12 @@ class FUNCTION:
     @staticmethod
     def GetObsFilePath(ObsFileSelectBox):
         global ComboxObsCount
+        global Obsvalue
         path = filedialog.askopenfilename(title='RINEX OBS File',
                                           filetypes=[('RINEX OBS File(*.o*.*.*obs.*.*d)', '*.*o;*.*obs;*.*d'),
                                                      ('All Files', '*.*')])
         if path and path not in ObsFileSelectBox['value']:
+            Obsvalue += (path,)
             ObsFileSelectBox['value'] += (path,)
             ComboxObsCount += 1
             ObsFileSelectBox.current(ComboxObsCount)
@@ -215,11 +220,13 @@ class FUNCTION:
     @staticmethod
     def GetNavFilePath(NavFileSelectBox):
         global ComboxNavCount
+        global Navvalue
         path = filedialog.askopenfilename(title='RINEX NAV File',
                                           filetypes=[('RINEX NAV File(*.*nav.*.hnav.*.gnav.*.qnav.*.*n.*.*g.*.*h.*.*q.*.*p)',
                                                       '*.*nav;*.hnav;*.gnav;*.qnav;*.*n;*.*g;*.*h;*.*q;*.*p'),
                                                      ('All Files', '*.*')])
         if path and path not in NavFileSelectBox['value']:
+            Navvalue += (path,)
             NavFileSelectBox['value'] += (path,)
             ComboxNavCount += 1
             NavFileSelectBox.current(ComboxNavCount)
@@ -227,8 +234,10 @@ class FUNCTION:
     @staticmethod
     def AskDirectory(AskDirectorySelectBox):
         global ComboxOutCount
+        global Outvalue
         path = filedialog.askdirectory()
         if path and path not in AskDirectorySelectBox['value']:
+            Outvalue += (path,)
             AskDirectorySelectBox['value'] += (path + "/*.sp",)
             ComboxOutCount += 1
             AskDirectorySelectBox.current(ComboxOutCount)
@@ -293,8 +302,28 @@ class FUNCTION:
         # -----------------------------------------------#
 
         ExecuteState.config(text='Processing...... file : %s' % obs_path[obspath:])
-        dll.Start(nav_path.encode(), obs_path.encode(), res_path.encode(), satellite_system)
-        ExecuteState.config(text='Complete generate file : %s!' % obsfile + ".sp")
+
+        dll = cdll.LoadLibrary('./brdm2pos.dll')
+        dll.brdm2pos.restype = c_double
+        match dll.brdm2pos(nav_path.encode(), obs_path.encode(), res_path.encode(), satellite_system):
+            case  0.0:
+                ExecuteState.config(text='Generated successfully ! file : %s' % obsfile + ".sp")
+            case -1.0:
+                ExecuteState.config(text='Error ! cant open nav file')
+            case -2.0:
+                ExecuteState.config(text='Error ! cant open obs file')
+            case -3.0:
+                ExecuteState.config(text='Error ! unsupported nav file')
+            case -4.0:
+                ExecuteState.config(text='Error ! no nav data')
+            case -5.0:
+                ExecuteState.config(text='Error ! unsupported obs file')
+            case -6.0:
+                ExecuteState.config(text='Error ! no obs data')
+        windll.kernel32.FreeLibrary('./brdm2pos.dll')
+
+
+
 
     def _ExecuteFile(self,ExecuteState,
                      ObsSelectBoxVar,
@@ -347,7 +376,7 @@ class MAINGUI:
         hwnd.mainloop()
 
     def initGUI(self, hwnd):
-        hwnd.title("KNZ_GeoTrackLab ver1.5.1")
+        hwnd.title("KNZ_GeoTrackLab %s"%version)
         hwnd.geometry('1200x700')
         hwnd.minsize(1200, 700)
 
@@ -598,7 +627,6 @@ class MAINGUI:
     def SPP_calculat(self, hwnd):
         # Brief # read .sp file & draw in the canvas & output the .po file
         # Return# none
-
         # Const define
         self.sattrack.clear()
         C_V = 299792458
@@ -666,13 +694,14 @@ class MAINGUI:
             with open(o_path, 'w+') as of:  # Initialize-------#
                 of.close()
             of = open(o_path, 'a+')
-            print("@ GENERATE PROGRAM   : KNZ_GeoTrackLab ver1.5.1\n"
+            print("@ GENERATE PROGRAM   : KNZ_GeoTrackLab %s\n"
                   "@ GENERATE TYPE      : Receiver Station Position\n"
                   "@ GENERATE TIME      : %s\n"
                   "@ GENERATE SYS       : %s\n"
                   "@ IONOS OPT          : %s\n"
                   "@ TROPO OPT          : %s\n"
-                  "@\n\n" % (time.asctime(time.localtime())
+                  "@\n\n" % ( version
+                             , time.asctime(time.localtime())
                              , satsysdict.get(satellite_system)
                              , ioncormode[ioncorstate]
                              , trocormode[trocorstate]), file=of)
@@ -718,23 +747,19 @@ class MAINGUI:
                     epoch = int(line[2:6])
 
                     count = 0
-                    # Check the lost epoch
                     while count < epoch - epoch_last - 1:
                         ENU_O = np.hstack((ENU_O, [[0], [0], [0]]))
                         satnumnarry = np.hstack((satnumnarry, [[0]]))
                         print("------------ MISSING EPOCH DATA", file=of)
                         count += 1
                     epoch_last = epoch
-                    # Calculate start
                     while 1:
                         line = f.readline()
                         if line == "\n":
-                            
-                            # The sampling rate of 3D draw  
+
                             if epoch % 15 == 0:
                                 self.sattrack.scatter(satX[0,:], satY[0,:], satZ[0,:], s=5, zdir='z', c=SatColor[6] )
 
-                            # Get the viald satellite number
                             satnumnarry = np.hstack((satnumnarry, [[satnum]]))
 
                             match satsysdict.get(satellite_system):
@@ -765,7 +790,6 @@ class MAINGUI:
                                     B = np.empty((0, 4))
                                     L = np.empty((0, 1))
                                     while 1:
-                                        # Linear the observation equation
                                         R = math.sqrt(
                                             pow((satX[0, count] - ap_X), 2) + pow((satY[0, count] - ap_Y), 2) + pow(
                                                 (satZ[0, count] - ap_Z), 2))
@@ -804,7 +828,7 @@ class MAINGUI:
                                                     Pl = C1[0, count]
                                             case 2:
                                                 pass
-                                        # Omc matrix
+
                                         L = np.vstack(
                                             ( L, [Pl - R + C_V * Dt[0, count] - Tro] )
                                         )
@@ -812,8 +836,7 @@ class MAINGUI:
                                         count += 1
                                         if count == satnum:
                                             break
-                                    
-                                    # Construct the Least Squares
+
                                     P = np.diag(Ptem)
                                     BTP = np.dot(np.transpose(B), P)
                                     BTPB = np.dot(BTP, B)
@@ -1271,8 +1294,10 @@ class EXECUDUI:
         # -----------------------------------------------------------------------------------
         ObsInFrame3 = ttk.LabelFrame(TopFrame1, text='RINEX Obs File')
         ObsInFrame3.pack(side=tk.TOP, expand=tk.YES, padx='1px', pady='2px', fill=tk.X)
-        ObsFileSelectBox = ttk.Combobox(ObsInFrame3, width=46, height=4, values=('',),
+
+        ObsFileSelectBox = ttk.Combobox(ObsInFrame3, width=46, height=4, values=Obsvalue,
                                         textvariable=self.ObsSelectBoxVar)
+        ObsFileSelectBox.current(ComboxObsCount)
         ObsFileSelectBox.pack(side=tk.LEFT, anchor='w', padx='1px', pady='1px')
 
         ObsFileSelectButton = ttk.Button(ObsInFrame3, text='...', width=3,
@@ -1283,8 +1308,10 @@ class EXECUDUI:
         #-----------------------------------------------------------------------------------
         NavInFrame3 = ttk.LabelFrame(TopFrame1, text='RINEX Nav File')
         NavInFrame3.pack(side=tk.TOP, expand=tk.YES, padx='1px', pady='2px', fill=tk.X)
-        NavFileSelectBox = ttk.Combobox(NavInFrame3, width=46, height=4, values=('',),
+
+        NavFileSelectBox = ttk.Combobox(NavInFrame3, width=46, height=4, values=Navvalue,
                                         textvariable=self.NavSelectBoxVar)
+        NavFileSelectBox.current(ComboxNavCount)
         NavFileSelectBox.pack(side=tk.LEFT, anchor='w', padx='1px', pady='1px')
 
         NavFileSelectButton = ttk.Button(NavInFrame3, text='...', width=3,
@@ -1308,8 +1335,9 @@ class EXECUDUI:
         AskOrNotCheckButton.pack(side=tk.LEFT, anchor='w', padx='1px', pady='0px')
 
         ## SelectBox Initialize
-        AskDirectorySelectBox = ttk.Combobox(FileOutFrame3, width=36, height=4, values=('',),
+        AskDirectorySelectBox = ttk.Combobox(FileOutFrame3, width=36, height=4, values=Outvalue,
                                              state=tk.DISABLED, textvariable=self.DirectorySelectBoxVar)
+        AskDirectorySelectBox.current(ComboxOutCount)
         AskDirectorySelectBox.pack(side=tk.LEFT, anchor='w', padx='1px', pady='0px')
 
         ## SelectButton Initialize

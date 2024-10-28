@@ -36,12 +36,15 @@
 
 ## 项目更新
 
-重命名项目并更新：2024/10/26
+更新：2024/10/28
+1. KNZ_GeoTrackLab：修复一些bug。
+2. KNZ_GeoTrackLab：优化代码结构。
 
-首次发布 KNZ_GeoTrackLab。
-1. KNZ_Calculate：与 KNZ_Plot 合并。
-2. KNZ_Plot：与 KNZ_Calculate 合并。
-3. KNZ_GeoTrackLab：支持 GPS、北斗、伽利略和 GLONASS。
+重命名项目并更新：2024/10/26
+1. 首次发布 KNZ_GeoTrackLab。
+2. KNZ_Calculate：与 KNZ_Plot 合并。
+3. KNZ_Plot：与 KNZ_Calculate 合并。
+4. KNZ_GeoTrackLab：支持 GPS、北斗、伽利略和 GLONASS。
 
 更新：2024/10/14
 1. KNZ_Calculate：支持 GPS、BDS 和伽利略。
