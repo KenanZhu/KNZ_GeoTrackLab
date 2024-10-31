@@ -39,8 +39,10 @@ ioncormode = ['OFF', 'Ion-Free LC', 'Broadcast']
 ioncorstate = 0
 trocormode = ['OFF', 'Hopfield', 'Saastamoinen']
 trocorstate = 0
+h_anglemode = ['0','5','10','15','20','25','30','35','40','45','50']
+h_anglestate = 0
 #Sat system register part
-satsysdict = {1: "G", 4:"R", 2:"C", 3:"E", 5:"S"}
+satsysdict = {1: "G", 2:"C", 3:"E", 4:"R", 5:"S"}
 satellite_system = 1
 ##Combox Count-er
 ComboxObsCount = 0
@@ -50,7 +52,7 @@ Navvalue = ('',)
 ComboxOutCount = 0
 Outvalue = ('',)
 #
-version = 'ver 1.5.3.1'
+version = 'ver 1.5.4.1'
 #
 #
 #
@@ -67,45 +69,60 @@ def Abo_windows():
     abo = tk.Toplevel(root)
     abo.title("About")
     abo.attributes('-toolwindow', 2)
-    abo.geometry('200x100')
-    abo.minsize(200, 100)
-    abo.maxsize(200, 100)
+    Move_center(abo,200,100)
+    abo.minsize(200,100)
+    abo.maxsize(200,100)
 
     About = tk.Label(abo, text="\nKNZ_GeoTrackLab %s\n\nCopyright (c) 2024 by KenanZhu\nAll Right Reserved."%version)
     About.pack(side=tk.TOP, expand=tk.YES)
 
+def Move_center(hwnd, win_x, win_y):
+
+    position_x = int((hwnd.winfo_screenwidth() - win_x) / 2)
+    position_y = int((hwnd.winfo_screenheight() - win_y) / 2)
+
+    hwnd.geometry(f'{win_x}x{win_y}+{position_x}+{position_y}')
+
 class FUNCTION:
 
     @staticmethod
-    def Colorchoose(i, label, mode):
+    def Colorchoose(hwnd,i, label, mode):
         # Brief # choice to change the color of draw
-        # Param # i : only for mode 1
+        # Param # i : for mode 0 & 1
         # Param # label : match the label with the button
         # Param # mode : color register type
-        #               undo choice == 0 &
-        #               middle choice store == 1 &
-        #               final confirm == 3 &
-        #               satn color == 4
+        #                undo choice == 0 &
+        #                middle choice store == 1 &
+        #                final confirm == 3 &
+        #                satn color == 4 &
+        #                satn undo == 5
         # Return# none
         global enucolor
         if mode == 0:
-            enucolor = ["#0080FF", "#0080FF", "#0080FF"]
-            satncolor[0] = "#0080FF"
-            label.config(bg=enucolor[0])
+            #enucolor = ["#0080FF", "#0080FF", "#0080FF"]
+            #satncolor[0] = "#0080FF"
+            label.config(bg=enucolor[i])
         elif mode == 1:
-            colorvalue = tk.colorchooser.askcolor()
-            enucolormid[i] = str(colorvalue[1])
-            label.config(bg=str(colorvalue[1]))
+            colorvalue = tk.colorchooser.askcolor(parent=hwnd)
+            if colorvalue[1] is not None:
+                enucolormid[i] = str(colorvalue[1])
+                label.config(bg=str(colorvalue[1]))
+            else:
+                return
         elif mode == 3:
             enucolor[0] = enucolormid[0]
             enucolor[1] = enucolormid[1]
             enucolor[2] = enucolormid[2]
             satncolor[0] = satncolormid[0]
         elif mode == 4:
-            colorvalue = tk.colorchooser.askcolor()
-            satncolormid[0] = str(colorvalue[1])
-            label.config(bg=str(colorvalue[1]))
-
+            colorvalue = tk.colorchooser.askcolor(parent=hwnd)
+            if colorvalue[1] is not None:
+                satncolormid[0] = str(colorvalue[1])
+                label.config(bg=str(colorvalue[1]))
+            else:
+                return
+        elif mode==5:
+            label.config(bg=satncolor[0])
     @staticmethod
     def Linewchoose(entry0, entry1, entry2, mode):
         # Brief # input to change the width of line
@@ -159,7 +176,7 @@ class FUNCTION:
                     enulinew[1] = entry1.get()
                     enulinew[2] = entry2.get()
 
-    def Calcu_confirm(self, v, cboxi, cboxt):
+    def Calcu_confirm(self, v, cboxi, cboxt, cboxangle):
         # Brief # choice to change the ion & tro correction && confirm the sat system
         # Param # v sat system radio button value
         # Param # cboxi the combo box of ion correction
@@ -167,10 +184,12 @@ class FUNCTION:
         # Return# none
         global ioncorstate
         global trocorstate
+        global h_anglestate
         global satellite_system
 
-        ioncorstate = self.Ion_and_Trocbox(cboxi, 0)
-        trocorstate = self.Ion_and_Trocbox(cboxt, 1)
+        ioncorstate = self.ITA_cbox(cboxi, 0)
+        trocorstate = self.ITA_cbox(cboxt, 1)
+        h_anglestate = self.ITA_cbox(cboxangle, 2)
         satellite_system = self.Satsys_button(v)
 
         print(ioncorstate, trocorstate, satellite_system)
@@ -184,11 +203,12 @@ class FUNCTION:
         return int(Systemdict.get(v.get()))
 
     @staticmethod
-    def Ion_and_Trocbox(cbox, cortype):
+    def ITA_cbox(cbox, cortype):
         # Brief # get the value of combo box
         # Param # cortype: correction type of
         #                            ion == 0 &
-        #                            tro == 1
+        #                            tro == 1 &
+        #                          angle == 2
         # Param # cbox:
         # Return# ion | tro state code
         count = -1
@@ -204,11 +224,18 @@ class FUNCTION:
                 if cbox.get() == tromode:
                     return count
 
+        elif cortype == 2:
+            for h_angle in h_anglemode:
+                count += 1
+                if cbox.get() == h_angle:
+                    return count
+
     @staticmethod
-    def GetObsFilePath(ObsFileSelectBox):
+    def GetObsFilePath(hwnd, ObsFileSelectBox):
         global ComboxObsCount
         global Obsvalue
-        path = filedialog.askopenfilename(title='RINEX OBS File',
+        path = filedialog.askopenfilename(parent=hwnd,
+                                          title='RINEX OBS File',
                                           filetypes=[('RINEX OBS File(*.o*.*.*obs.*.*d)', '*.*o;*.*obs;*.*d'),
                                                      ('All Files', '*.*')])
         if path and path not in ObsFileSelectBox['value']:
@@ -218,10 +245,11 @@ class FUNCTION:
             ObsFileSelectBox.current(ComboxObsCount)
 
     @staticmethod
-    def GetNavFilePath(NavFileSelectBox):
+    def GetNavFilePath(hwnd, NavFileSelectBox):
         global ComboxNavCount
         global Navvalue
-        path = filedialog.askopenfilename(title='RINEX NAV File',
+        path = filedialog.askopenfilename(parent=hwnd,
+                                          title='RINEX NAV File',
                                           filetypes=[('RINEX NAV File(*.*nav.*.hnav.*.gnav.*.qnav.*.*n.*.*g.*.*h.*.*q.*.*p)',
                                                       '*.*nav;*.hnav;*.gnav;*.qnav;*.*n;*.*g;*.*h;*.*q;*.*p'),
                                                      ('All Files', '*.*')])
@@ -232,10 +260,10 @@ class FUNCTION:
             NavFileSelectBox.current(ComboxNavCount)
 
     @staticmethod
-    def AskDirectory(AskDirectorySelectBox):
+    def AskDirectory(hwnd, AskDirectorySelectBox):
         global ComboxOutCount
         global Outvalue
-        path = filedialog.askdirectory()
+        path = filedialog.askdirectory(parent=hwnd)
         if path and path not in AskDirectorySelectBox['value']:
             Outvalue += (path,)
             AskDirectorySelectBox['value'] += (path + "/*.sp",)
@@ -305,7 +333,8 @@ class FUNCTION:
 
         dll = cdll.LoadLibrary('./brdm2pos.dll')
         dll.brdm2pos.restype = c_double
-        match dll.brdm2pos(nav_path.encode(), obs_path.encode(), res_path.encode(), satellite_system):
+        match dll.brdm2pos(nav_path.encode(), obs_path.encode(), res_path.encode(),
+                           satellite_system, int(h_anglemode[h_anglestate])):
             case  0.0:
                 ExecuteState.config(text='Generated successfully ! file : %s' % obsfile + ".sp")
             case -1.0:
@@ -321,9 +350,6 @@ class FUNCTION:
             case -6.0:
                 ExecuteState.config(text='Error ! no obs data')
         windll.kernel32.FreeLibrary('./brdm2pos.dll')
-
-
-
 
     def _ExecuteFile(self,ExecuteState,
                      ObsSelectBoxVar,
@@ -377,7 +403,7 @@ class MAINGUI:
 
     def initGUI(self, hwnd):
         hwnd.title("KNZ_GeoTrackLab %s"%version)
-        hwnd.geometry('1200x700')
+        Move_center(hwnd,1200,700)
         hwnd.minsize(1200, 700)
 
         icon_img = (b'AAABAAEAICAAAAEAIACoEAAAFgAAACgAAAAgAAAAQAAAAAEAIAAAAAAAgBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
@@ -614,7 +640,7 @@ class MAINGUI:
                             self.canvas0.draw()
 
                             self.satn.clear()
-                            self.satn.plot(satnumnarry[0, :], marker='_', linestyle=None, color=satncolor[0], linewidth=0)
+                            self.satn.plot(satnumnarry[0, :], marker='|', ms=5, linestyle=None, color=satncolor[0], linewidth=0)
                             self.satn.set_title('Valid Sat Numbers', loc='left', fontsize=8)
                             self.satn.set_xlabel('Epochs')
                             self.satn.grid(True, linestyle='--', alpha=0.7)
@@ -630,19 +656,6 @@ class MAINGUI:
         # Const define
         self.sattrack.clear()
         C_V = 299792458
-        f1 = 1575.42
-        f2 = 1227.60
-
-        match satsysdict.get(satellite_system):
-            case 'G':
-                f1 = 1575.42
-                f2 = 1227.60
-            case 'E':
-                f1 = 1575.42
-                f2 = 1278.75
-            case 'C':
-                f1 = 1561.098
-                f2 = 1207.140
 
         ENU_O = np.empty((3, 0))
         GDOP = np.empty((1, 0))
@@ -676,7 +689,7 @@ class MAINGUI:
             obspath = len(Obs)
             while obspath > 0:
                 flag = Obs[obspath - 1:obspath]
-                if flag == "/":
+                if flag == "/" or flag == "\\":
                     obsfile = satsysdict.get(satellite_system) + "-" + Obs[obspath:-4]
                     break
                 obspath -= 1
@@ -700,7 +713,7 @@ class MAINGUI:
                   "@ GENERATE SYS       : %s\n"
                   "@ IONOS OPT          : %s\n"
                   "@ TROPO OPT          : %s\n"
-                  "@\n\n" % ( version
+                  "@\n\n" % (  version
                              , time.asctime(time.localtime())
                              , satsysdict.get(satellite_system)
                              , ioncormode[ioncorstate]
@@ -711,9 +724,9 @@ class MAINGUI:
 
             # Coordinate transformation matrix---------------#
             S = np.array([
-                [-math.sin(apL), math.cos(apL), 0],
+                [-math.sin(apL)                ,  math.cos(apL)                , 0            ],
                 [-math.sin(apB) * math.cos(apL), -math.sin(apB) * math.sin(apL), math.cos(apB)],
-                [math.cos(apB) * math.cos(apL), math.cos(apB) * math.sin(apL), math.sin(apB)]
+                [ math.cos(apB) * math.cos(apL),  math.cos(apB) * math.sin(apL), math.sin(apB)]
             ])
             # -----------------------------------------------#
             self.plotstate.config(text="Reading...")
@@ -733,9 +746,9 @@ class MAINGUI:
                     satY = np.empty((1, 0))
                     satZ = np.empty((1, 0))
                     C1 = np.empty((1, 0))
-                    C2 = np.empty((1, 0))
+
                     ma = np.empty((1, 0))
-                    np.empty((1, 0))
+
                     Dt = np.empty((1, 0))
 
                     year = int(line[6:10])
@@ -798,39 +811,14 @@ class MAINGUI:
                                         n = -((satZ[0, count] - ap_Z) / R)
                                         B = np.vstack((B, [l, m, n, 1]))
                                         Ptem.append(pow(math.sin(math.radians(ma[0, count])), 2))
-                                        Pl = 0
                                         # Get the tropsphere correction
                                         match trocorstate:
-                                            case 0:
-                                                Tro = 0
-                                            case 1:
-                                                Tro = Trocor.Hop_tro_cor(apH, ma[0, count])
-                                            case 2:
-                                                Tro = Trocor.Sas_tro_cor(apB, apH, ma[0, count])
-                                                pass
-                                        # Get the ionsphere correction
-                                        match ioncorstate:
-                                            case 0:
-                                                if C1[0, count] == 0 and C2[0, count] != 0:
-                                                    Pl = C2[0, count]
-
-                                                elif C1[0, count] != 0 and C2[0, count] == 0:
-                                                    Pl = C1[0, count]
-                                            case 1:
-                                                if C2[0, count] != 0 and C1[0, count] != 0:
-                                                    Pl = (f1 * f1 * C1[0, count]) / (f1 * f1 - f2 * f2) - (
-                                                            f2 * f2 * C2[0, count]) / (f1 * f1 - f2 * f2)
-
-                                                elif C1[0, count] == 0 and C2[0, count] != 0:
-                                                    Pl = C2[0, count]
-
-                                                elif C1[0, count] != 0 and C2[0, count] == 0:
-                                                    Pl = C1[0, count]
-                                            case 2:
-                                                pass
+                                            case 0:Tro = 0
+                                            case 1:Tro = Trocor.Hop_tro_cor(apH, ma[0, count])
+                                            case 2:Tro = Trocor.Sas_tro_cor(apB, apH, ma[0, count])
 
                                         L = np.vstack(
-                                            ( L, [Pl - R + C_V * Dt[0, count] - Tro] )
+                                            ( L, [C1[0, count] - R + C_V * Dt[0, count] - Tro] )
                                         )
 
                                         count += 1
@@ -850,19 +838,18 @@ class MAINGUI:
                                 DeltaXYZ = np.array([[X - apX], [Y - apY], [Z - apZ]])
                                 ENU = S @ DeltaXYZ
                                 #if math.fabs(ENU[0, 0]) > 25 or math.fabs(ENU[1, 0]) > 25 or math.fabs(ENU[2, 0]) > 50:
-                                #   ENU_O = np.hstack((ENU_O, [[0], [0], [0]]))
-                                #   print("------------ ANOMALY RESOLUTION", file=of)
+                                #    ENU_O = np.hstack((ENU_O, [[0], [0], [0]]))
+                                #    print("------------ ANOMALY RESOLUTION", file=of)
                                 #else:
-
                                 ENU_O = np.hstack((ENU_O, [[ENU[0, 0]], [ENU[1, 0]], [ENU[2, 0]]]))
                                 GDOP = np.hstack((GDOP, [ [math.sqrt(Qtrace)] ]))
 
                                 print(
                                         "%4d\\%02d\\%02d\\%02d\\%02d\\%04.1f %12.4f %12.4f %12.4f %3d %10.5f %10.5f %10.5f"
                                         % (year, month, day, hour, min, sec, X, Y, Z, satnum,
-                                           float(ENU[0, 0]),
-                                           float(ENU[1, 0]),
-                                           float(ENU[2, 0]) ), file=of)
+                                            float(ENU[0, 0]),
+                                            float(ENU[1, 0]),
+                                            float(ENU[2, 0]) ), file=of)
                                 break
                             else:
                                 break
@@ -875,9 +862,8 @@ class MAINGUI:
                             satY = np.hstack((satY, [[float(line[22:37])]]))
                             satZ = np.hstack((satZ, [[float(line[38:53])]]))
                             C1   = np.hstack((C1,   [[float(line[55:69])]]))
-                            C2   = np.hstack((C2,   [[float(line[71:85])]]))
-                            ma   = np.hstack((ma,   [[float(line[86:101])]]))
-                            Dt   = np.hstack((Dt,   [[float(line[102:118])]]))
+                            ma   = np.hstack((ma,   [[float(line[71:85])]]))
+                            Dt   = np.hstack((Dt,   [[float(line[86:102])]]))
 
                 elif line.find("END") >= 0:
                     self.ex.clear()
@@ -904,7 +890,7 @@ class MAINGUI:
                     self.canvas0.draw()
 
                     self.satn.clear()
-                    self.satn.plot(satnumnarry[0, :], marker='_', ms=10, linestyle=None, color=satncolor[0], linewidth=0)
+                    self.satn.plot(satnumnarry[0, :], marker='|', ms=5, linestyle=None, color=satncolor[0], linewidth=0)
                     self.satn.set_title('Valid Satellite Numbers',loc='left', fontsize=8)
                     self.satn.set_xlabel('Epochs')
                     self.satn.grid(True, linestyle='--', alpha=0.7)
@@ -939,10 +925,10 @@ class OPTGUI:
     def initGUI(self,hwnd):
         self.opthwnd = tk.Toplevel(hwnd)
         self.opthwnd.title("Options")
-        self.opthwnd.resizable(0, 0)
-        self.opthwnd.geometry('320x250')
-        self.opthwnd.minsize(320, 250)
-        self.opthwnd.maxsize(320, 250)
+        self.opthwnd.resizable(0,0)
+        Move_center(self.opthwnd,320,250)
+        self.opthwnd.minsize(320,250)
+        self.opthwnd.maxsize(320,250)
 
         icon_img2 = (b'AAABAAEAICAAAAAAIACoEAAAFgAAACgAAAAgAAAAQAAAAAEAIAAAAAAAABAAADjsAAA47AAAAAA'
                      b'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
@@ -1066,6 +1052,22 @@ class OPTGUI:
         self.ctrobox.current(trocorstate)
         self.ctrobox.pack(side=tk.RIGHT, anchor='e')
 
+
+        TOP3Frame0 = ttk.Frame(self.Main1Frame0)
+        TOP3Frame0.pack(side=tk.TOP, expand=tk.YES, padx='1px', pady='2px', fill=tk.X)
+
+        h_angle = ttk.Label(TOP3Frame0, text='Satellite Elevation(°) / #')
+        h_angle.pack(side=tk.LEFT, anchor='w', padx='1px')
+
+        self.angleentry = ttk.Entry(TOP3Frame0, width=8)
+        self.angleentry.pack(side=tk.RIGHT, anchor='w')
+
+        self.canglebox = ttk.Combobox(TOP3Frame0, width=6, height=10)
+        self.canglebox['state'] = 'readonly'
+        self.canglebox['value'] = ('0','5','10','15','20','25','30','35','40','45','50')
+        self.canglebox.current(h_anglestate)
+        self.canglebox.pack(side=tk.RIGHT, anchor='e')
+
         # GNSS Options#
         TOP5Frame0 = ttk.LabelFrame(self.Main1Frame0, text='Satellite system', labelanchor='nw')
         TOP5Frame0.pack(side=tk.TOP, expand=tk.YES, padx='1px', pady='2px', fill=tk.X)
@@ -1132,15 +1134,15 @@ class OPTGUI:
         SatnFrameB1 = tk.Frame(Buttom1Frame1)
         SatnFrameB1.pack(side=tk.LEFT, expand=tk.YES, padx='5px', pady='0px')
         satncolopt = ttk.Button(SatnFrameB1, text='Satn Color', width=10,
-                                command=lambda: self.Cmd.Colorchoose(0, satncollab, 4))
+                                command=lambda: self.Cmd.Colorchoose(self.opthwnd,0, satncollab, 4))
         satncolopt.pack(side=tk.LEFT, expand=tk.YES, padx='5px', pady='0px')
-        satncollab = tk.Label(SatnFrameB1, width=5, height=1, bg=satncolormid[0])
+        satncollab = tk.Label(SatnFrameB1, width=5, height=1, bg=satncolor[0])
         satncollab.pack(side=tk.LEFT, expand=tk.YES, padx='5px', pady='0px')
 
         LineConB1 = tk.Frame(Buttom1Frame1)
         LineConB1.pack(side=tk.RIGHT, expand=tk.YES, padx='5px', pady='0px')
         linewre = ttk.Button(LineConB1, text='Undo', width=10,
-                             command=lambda: self.Cmd.Colorchoose(0, satncollab, 0))
+                             command=lambda: self.Cmd.Colorchoose(self.opthwnd,0, satncollab, 5))
         linewre.pack(side=tk.LEFT, expand=tk.YES, padx='1px')
 
         # Line's colors options#
@@ -1150,7 +1152,7 @@ class OPTGUI:
         EFrameL2 = tk.Frame(Left2Frame1)
         EFrameL2.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='0px')
         ecolopt = ttk.Button(EFrameL2, text='E Color', width=10,
-                             command=lambda: self.Cmd.Colorchoose(0, ecollab, 1))
+                             command=lambda: self.Cmd.Colorchoose(self.opthwnd,0, ecollab, 1))
         ecolopt.pack(side=tk.LEFT, expand=tk.YES, padx='5px', pady='0px')
         ecollab = tk.Label(EFrameL2, width=5, height=1, bg=enucolor[0])
         ecollab.pack(side=tk.LEFT, expand=tk.YES, padx='5px', pady='0px')
@@ -1158,7 +1160,7 @@ class OPTGUI:
         NFrameL2 = tk.Frame(Left2Frame1)
         NFrameL2.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='0px')
         ncolopt = ttk.Button(NFrameL2, text='N Color', width=10,
-                             command=lambda: self.Cmd.Colorchoose(1, ncollab, 1))
+                             command=lambda: self.Cmd.Colorchoose(self.opthwnd,1, ncollab, 1))
         ncolopt.pack(side=tk.LEFT, expand=tk.YES, padx='5px', pady='0px')
         ncollab = tk.Label(NFrameL2, width=5, height=1, bg=enucolor[1])
         ncollab.pack(side=tk.LEFT, expand=tk.YES, padx='5px', pady='0px')
@@ -1166,7 +1168,7 @@ class OPTGUI:
         UFrameL2 = tk.Frame(Left2Frame1)
         UFrameL2.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='0px')
         ucolopt = ttk.Button(UFrameL2, text='U Color', width=10,
-                             command=lambda: self.Cmd.Colorchoose(2, ucollab, 1))
+                             command=lambda: self.Cmd.Colorchoose(self.opthwnd,2, ucollab, 1))
         ucolopt.pack(side=tk.LEFT, expand=tk.YES, padx='5px', pady='0px')
         ucollab = tk.Label(UFrameL2, width=5, height=1, bg=enucolor[2])
         ucollab.pack(side=tk.LEFT, expand=tk.YES, padx='5px', pady='0px')
@@ -1174,9 +1176,9 @@ class OPTGUI:
         ColorConL2 = tk.Frame(Left2Frame1)
         ColorConL2.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='0px')
         colorcon = ttk.Button(ColorConL2, text='Undo', width=10,
-                              command=lambda: [self.Cmd.Colorchoose(0, ecollab, 0)
-                                  , self.Cmd.Colorchoose(0, ncollab, 0)
-                                  , self.Cmd.Colorchoose(0, ucollab, 0)])
+                              command=lambda: [self.Cmd.Colorchoose(self.opthwnd,0, ecollab, 0)
+                                  , self.Cmd.Colorchoose(self.opthwnd,1, ncollab, 0)
+                                  , self.Cmd.Colorchoose(self.opthwnd,2, ucollab, 0)])
         colorcon.pack(side=tk.LEFT, expand=tk.YES, padx='5px', pady='0px')
 
     def initCONFIRM(self):
@@ -1187,12 +1189,11 @@ class OPTGUI:
                                  command=lambda: [self.opthwnd.destroy()])
         TotalCancel.pack(side=tk.RIGHT, padx='1px', anchor='e')
         TotalCon = ttk.Button(Bottom0Frame0, text='Confirm', width=10,
-                              command=lambda: [self.Cmd.Colorchoose(0, None, 3),
+                              command=lambda: [self.Cmd.Colorchoose(self.opthwnd,0, None, 3),
                                                self.Cmd.Linewchoose(self.elinewidth,
                                                                     self.nlinewidth,
                                                                     self.ulinewidth, 1),
-                                               self.Cmd.Calcu_confirm(self.v, self.cionbox, self.ctrobox),
-                                               self.opthwnd.destroy()])
+                                               self.Cmd.Calcu_confirm(self.v, self.cionbox, self.ctrobox, self.canglebox)])
         TotalCon.pack(side=tk.RIGHT, padx='1px', anchor='e')
 
 class EXECUDUI:
@@ -1213,10 +1214,10 @@ class EXECUDUI:
     def initGUI(self,hwnd):
         self.exehwnd = tk.Toplevel(hwnd)
         self.exehwnd.title("RINEX Processor")
-        self.exehwnd.resizable(0, 0)
-        self.exehwnd.geometry('400x215')
-        self.exehwnd.minsize(400, 215)
-        self.exehwnd.maxsize(400, 215)
+        self.exehwnd.resizable(0,0)
+        Move_center(self.exehwnd,550,180)
+        self.exehwnd.minsize(550,180)
+        self.exehwnd.maxsize(550,180)
 
         global icon_img3
         icon_img3 = (b'AAABAAEAICAAAAEAIACoEAAAFgAAACgAAAAgAAAAQAAAAAEAIAAAAAAAABAAADjsAAA47AAAAAAAAAAAAAAAAAAAAAAAAAA'
@@ -1289,41 +1290,41 @@ class EXECUDUI:
         MainFrame0 = tk.Frame(self.exehwnd)
         MainFrame0.pack()
         TopFrame1 = ttk.Frame(MainFrame0)
-        TopFrame1.pack(side=tk.TOP, expand=tk.YES, padx='1px', pady='2px', fill=tk.X)
+        TopFrame1.pack(side=tk.TOP, expand=tk.YES, padx='1px', pady='1px', fill=tk.X)
 
         # -----------------------------------------------------------------------------------
         ObsInFrame3 = ttk.LabelFrame(TopFrame1, text='RINEX Obs File')
-        ObsInFrame3.pack(side=tk.TOP, expand=tk.YES, padx='1px', pady='2px', fill=tk.X)
+        ObsInFrame3.pack(side=tk.TOP, expand=tk.YES, padx='1px', pady='0px', fill=tk.X)
 
-        ObsFileSelectBox = ttk.Combobox(ObsInFrame3, width=46, height=4, values=Obsvalue,
+        ObsFileSelectBox = ttk.Combobox(ObsInFrame3, width=70, height=4, values=Obsvalue,
                                         textvariable=self.ObsSelectBoxVar)
         ObsFileSelectBox.current(ComboxObsCount)
-        ObsFileSelectBox.pack(side=tk.LEFT, anchor='w', padx='1px', pady='1px')
+        ObsFileSelectBox.pack(side=tk.LEFT, anchor='w', padx='0px', pady='0px')
 
         ObsFileSelectButton = ttk.Button(ObsInFrame3, text='...', width=3,
-                                         command=lambda: self.Cmd.GetObsFilePath(ObsFileSelectBox))
-        ObsFileSelectButton.pack(side=tk.RIGHT, anchor='e', padx='1px', pady='1px')
+                                         command=lambda: self.Cmd.GetObsFilePath(self.exehwnd,ObsFileSelectBox))
+        ObsFileSelectButton.pack(side=tk.RIGHT, anchor='e', padx='1px', pady='0px')
         # -----------------------------------------------------------------------------------
 
         #-----------------------------------------------------------------------------------
         NavInFrame3 = ttk.LabelFrame(TopFrame1, text='RINEX Nav File')
-        NavInFrame3.pack(side=tk.TOP, expand=tk.YES, padx='1px', pady='2px', fill=tk.X)
+        NavInFrame3.pack(side=tk.TOP, expand=tk.YES, padx='1px', pady='0px', fill=tk.X)
 
-        NavFileSelectBox = ttk.Combobox(NavInFrame3, width=46, height=4, values=Navvalue,
+        NavFileSelectBox = ttk.Combobox(NavInFrame3, width=70, height=4, values=Navvalue,
                                         textvariable=self.NavSelectBoxVar)
         NavFileSelectBox.current(ComboxNavCount)
-        NavFileSelectBox.pack(side=tk.LEFT, anchor='w', padx='1px', pady='1px')
+        NavFileSelectBox.pack(side=tk.LEFT, anchor='w', padx='0px', pady='0px')
 
         NavFileSelectButton = ttk.Button(NavInFrame3, text='...', width=3,
-                                         command=lambda: self.Cmd.GetNavFilePath(NavFileSelectBox))
-        NavFileSelectButton.pack(side=tk.RIGHT, anchor='e', padx='1px', pady='1px')
+                                         command=lambda: self.Cmd.GetNavFilePath(self.exehwnd,NavFileSelectBox))
+        NavFileSelectButton.pack(side=tk.RIGHT, anchor='e', padx='1px', pady='0px')
         # -----------------------------------------------------------------------------------
 
         BottomFrame1 = ttk.Frame(MainFrame0)
-        BottomFrame1.pack(side=tk.BOTTOM, expand=tk.YES, padx='1px', pady='2px', fill=tk.X)
+        BottomFrame1.pack(side=tk.BOTTOM, expand=tk.YES, padx='1px', pady='0px', fill=tk.X)
 
         FileOutFrame3 = ttk.LabelFrame(BottomFrame1, text='Output Directory')
-        FileOutFrame3.pack(side=tk.TOP, expand=tk.YES, padx='1px', pady='2px', fill=tk.X)
+        FileOutFrame3.pack(side=tk.TOP, expand=tk.YES, padx='1px', pady='0px', fill=tk.X)
 
         ## CheckButton Initialize
         AskOrNotCheckButton = ttk.Checkbutton(FileOutFrame3, text='Directory',
@@ -1332,21 +1333,21 @@ class EXECUDUI:
                                                                             self.AskOrNotCheckButtonVar,
                                                                             AskDirectorySelectBox,
                                                                             AskDirectorySelectButton))
-        AskOrNotCheckButton.pack(side=tk.LEFT, anchor='w', padx='1px', pady='0px')
+        AskOrNotCheckButton.pack(side=tk.LEFT, anchor='w', padx='0px', pady='0px')
 
         ## SelectBox Initialize
-        AskDirectorySelectBox = ttk.Combobox(FileOutFrame3, width=36, height=4, values=Outvalue,
+        AskDirectorySelectBox = ttk.Combobox(FileOutFrame3, width=60, height=4, values=Outvalue,
                                              state=tk.DISABLED, textvariable=self.DirectorySelectBoxVar)
         AskDirectorySelectBox.current(ComboxOutCount)
-        AskDirectorySelectBox.pack(side=tk.LEFT, anchor='w', padx='1px', pady='0px')
+        AskDirectorySelectBox.pack(side=tk.LEFT, anchor='w', padx='0px', pady='0px')
 
         ## SelectButton Initialize
-        AskDirectorySelectButton = ttk.Button(FileOutFrame3, text='...', width=3,
-                                              state=tk.DISABLED, command=lambda: self.Cmd.AskDirectory(AskDirectorySelectBox))
-        AskDirectorySelectButton.pack(side=tk.RIGHT, anchor='e', padx='2px', pady='0px')
+        AskDirectorySelectButton = ttk.Button(FileOutFrame3, text='...', width=3, state=tk.DISABLED,
+                                              command=lambda: self.Cmd.AskDirectory(self.exehwnd, AskDirectorySelectBox))
+        AskDirectorySelectButton.pack(side=tk.RIGHT, anchor='e', padx='1px', pady='0px')
 
         ExeFrame3 = ttk.Frame(BottomFrame1)
-        ExeFrame3.pack(side=tk.TOP, expand=tk.YES, padx='1px', pady='2px', fill=tk.X)
+        ExeFrame3.pack(side=tk.TOP, expand=tk.YES, padx='1px', pady='0px', fill=tk.X)
 
         ExitButton = ttk.Button(ExeFrame3, text='Exit', width=10,
                                 command=self.exehwnd.destroy)
@@ -1372,7 +1373,8 @@ def View_windowshow(text, view):
     # Param # text : the show box of file of choice
     # Param # view : the father window of text ctr box
     # Return# none
-    f_path = filedialog.askopenfilename()
+    f_path = filedialog.askopenfilename(parent=view)
+    if not f_path: return 0
     view.title('Viewing: %s' % f_path)
     text.delete('1.0', 'end')
     with open(f_path, 'r') as f:
@@ -1388,7 +1390,7 @@ class VIEWGUI:
     def initGUI(hwnd):
         view = tk.Toplevel(hwnd)
         view.title("View")
-        view.geometry('900x600')
+        Move_center(view,1000,600)
         view.minsize(1000, 600)
 
         global icon_img1

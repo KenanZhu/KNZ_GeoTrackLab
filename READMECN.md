@@ -36,6 +36,12 @@
 
 ## 项目更新
 
+更新: 2024/10/31:
+1. KNZ_GeoTrackLab: 修复一些bug, 优化UI逻辑.
+2. KNZ_GeoTrackLab: 优化代码结构.
+3. KNZ_GeoTrackLab: 新增: 
+                        截止高度角选项。
+
 更新：2024/10/28
 1. KNZ_GeoTrackLab：修复一些bug。
 2. KNZ_GeoTrackLab：优化代码结构。

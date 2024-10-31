@@ -1,57 +1,61 @@
 #include "brdm2pos.h"
 using namespace std;
-/* -------------------------------------------------------------------------- */
-/// @brief degree to radian
-/// @param deg 
-/// @return return radian
-/* -------------------------------------------------------------------------- */
+/**
+ * Degree to radian.
+ * 
+ * \param deg: Degree
+ * \return Radian
+ */
 double deg2rad(double deg)
 {
 	double rad = (PI / 180) * deg;
 	return rad;
 }
-/* -------------------------------------------------------------------------- */
-/// @brief radian to degree                      
-/// @param rad 
-/// @return return degree
-/* -------------------------------------------------------------------------- */
+/**
+ * Radian to degree .
+ * 
+ * \param rad: Radian
+ * \return Degree
+ */
 double rad2deg(double rad)
 {
 	double deg = (180 / PI) * rad;
 	return deg;
 }
-/* -------------------------------------------------------------------------- */
-/// @brief satellite azimuth angle calculation
-/// @param rahcal parameter transfer structure
-/// @param E east
-/// @param N north
-/// @param U up
-/// @return return structure contain R, A, H members                      
-/* -------------------------------------------------------------------------- */
-rahcal RAHCAL(rahcal rahcal,
+/**
+ * Azimuth/Calculate.
+ * 
+ * \param rah: Parameter transfer structure
+ * \param E: East
+ * \param N: North
+ * \param U: Up
+ * \return structure contain R, A, H members
+ */
+rah rahcal(rah rah,
 	double E, double N, double U)
 {
-	rahcal.H = atan2(U, sqrt(E * E + N * N));
-	rahcal.A = atan2(E, U);
-	if (rahcal.A < 0)
-		rahcal.A += 2 * PI;
-	if (rahcal.A > 2 * PI)
-		rahcal.A -= 2 * PI;
-	rahcal.R = sqrt(E * E + N * N + U * U);
+	rah.H = atan2(U, sqrt(E * E + N * N));
+	rah.A = atan2(E, U);
+	if (rah.A < 0)
+		rah.A += 2 * PI;
+	if (rah.A > 2 * PI)
+		rah.A -= 2 * PI;
+	rah.R = sqrt(E * E + N * N + U * U);
 
-	return rahcal;
+	return rah;
 }
-/* -------------------------------------------------------------------------- */
-/// @brief convert BLH coordinates to ENU coordinates
-/// @param blh2enu parameter transfer structure
-/// @param stationB latitude of receiver station
-/// @param stationL longitude of receiver station
-/// @param deltax X-coordinate difference of satellite arrival center
-/// @param deltay Y-coordinate difference of satellite arrival center
-/// @param deltaz Z-coordinate difference of satellite arrival center
-/// @return return type of structure contain E, N, U members
-/* -------------------------------------------------------------------------- */
-blh2enu BLH2ENU(blh2enu blh2enu,
+/**
+ * Convert BLH coordinates to ENU coordinates.
+ * 
+ * \param enu: Parameter transfer structure
+ * \param stationB: Latitude of receiver station
+ * \param stationL: Longitude of receiver station
+ * \param deltax: Deltax X-coordinate difference of satellite arrival center
+ * \param deltay: Deltax Y-coordinate difference of satellite arrival center
+ * \param deltaz: Deltax Z-coordinate difference of satellite arrival center
+ * \return 
+ */
+enu blh2enu(enu enu,
 	double stationB, double stationL,
 	double deltax, double deltay, double deltaz)
 {
@@ -59,29 +63,28 @@ blh2enu BLH2ENU(blh2enu blh2enu,
 	double cosB = cos(stationB);
 	double sinL = sin(stationL);
 	double cosL = cos(stationL);
-	blh2enu.E = -sinL * (deltax)+cosL * (deltay);
-	blh2enu.N = -sinB * cosL * (deltax)-sinB * sinL * (deltay)+cosB * (deltaz);
-	blh2enu.U = cosB * cosL * (deltax)+cosB * sinL * (deltay)+sinB * (deltaz);
+	enu.E = -sinL * (deltax)       +cosL * (deltay);
+	enu.N = -sinB * cosL * (deltax)-sinB * sinL * (deltay)+cosB * (deltaz);
+	enu.U =  cosB * cosL * (deltax)+cosB * sinL * (deltay)+sinB * (deltaz);
 
-	return blh2enu;
+	return enu;
 }
-/* -------------------------------------------------------------------------- */
-/// @brief Convert ECEF geostationary coordinates to BLH coordinates
-/// @param xyz2blh parameter transfer structure
-/// @param X X coordinates of ECEF
-/// @param Y Y coordinates of ECEF
-/// @param Z Z coordinates of ECEF
-/// @param a major semiaxis of WGS-84 ellipsoid
-/// @param e2 the square of the first eccentricity of WGS-84 ellipsoid
-/// @return return type of structure contain B, L, H members
-/* -------------------------------------------------------------------------- */
-xyz2blh XYZ2BLH(xyz2blh xyz2blh,
+/**
+ * Convert ECEF geostationary coordinates to BLH coordinates.
+ * 
+ * \param blh: Parameter transfer structure
+ * \param X: X coordinates of ECEF
+ * \param Y; Y coordinates of ECEF
+ * \param Z: Z coordinates of ECEF
+ * \return type of structure contain B, L, H members
+ */
+blh xyz2blh(blh blh,
 	double X, double Y, double Z)
 {
 	double B = 0.0, N = 0.0, H = 0.0, R0, R1, deltaH, deltaB;
 	R0 = sqrt(pow(X, 2) + pow(Y, 2));
 	R1 = sqrt(pow(X, 2) + pow(Y, 2) + pow(Z, 2));
-	xyz2blh.L = atan2(Y, X);
+	blh.L = atan2(Y, X);
 	N = a;
 	H = R1 - a;
 	B = atan2(Z * (N + H), R0 * (N * (1 - e2) + H));
@@ -92,8 +95,8 @@ xyz2blh XYZ2BLH(xyz2blh xyz2blh,
 		H = R0 / cos(B) - N;
 		B = atan2(Z * (N + H), R0 * (N * (1 - e2) + H));
 	} while (fabs(deltaH - H) > 1.0e-3 && fabs(deltaB - B) > 1.0e-9);
-	xyz2blh.B = B;
-	xyz2blh.H = H;
+	blh.B = B;
+	blh.H = H;
 
-	return xyz2blh;
+	return blh;
 }

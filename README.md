@@ -36,6 +36,12 @@ Features ：
   
 ## Project Update
 
+Update: 2024/10/31:
+1.  KNZ_GeoTrackLab: Fix some bug, Modify some UI logic.
+2.  KNZ_GeoTrackLab: Optimize code structure.
+3.  KNZ_GeoTrackLab: New added: 
+                                Elevation angle option.
+                                
 Update: 2024/10/28
 1.  KNZ_GeoTrackLab: Fix some bug.
 2.  KNZ_GeoTrackLab: Optimize code structure.
