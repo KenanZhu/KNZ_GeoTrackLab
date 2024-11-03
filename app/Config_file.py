@@ -49,7 +49,7 @@ class Configinit:
         # -------------------------------------------------------------------------------
         ### Config for software info
         self.config.add_section('INFO')
-        self.config.set('INFO', 'Version','1.5.4.1')
+        self.config.set('INFO', 'Version','1.5.5.0')
         self.config.add_section('Options_Calc')
         ### Config for calculate param
         self.config.set('Options_Calc', 'Iono_model', '0')

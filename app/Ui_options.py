@@ -16,6 +16,8 @@ from base64 import b64decode
 
 import tkinter as tk
 
+
+# noinspection PyProtectedMember
 class OPTGUI:
     def __init__(
             self,

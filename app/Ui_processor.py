@@ -17,6 +17,7 @@ from base64 import b64decode
 import tkinter as tk
 
 
+# noinspection PyProtectedMember
 class EXECUDUI:
     def __init__(self, hwndparent, cfg_get, func):
         # init

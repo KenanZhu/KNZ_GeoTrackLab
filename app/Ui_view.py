@@ -16,6 +16,8 @@ from tkinter import filedialog
 
 import tkinter as tk
 
+
+# noinspection PyProtectedMember
 class VIEWGUI:
     def __init__(self, hwndparent, func):
         # init

@@ -64,8 +64,7 @@ int select_epoch(double SecofWeek, int sPRN, pnav_body nav_b, int satnum, int sy
         for (int i = 0; i < satnum; i++){
             if (sPRN == nav_b[i].sPRN_GLO){
                 Min = fabs(SecofWeek - nav_b[i].TOE);
-                if (Min <= min)
-                {
+                if (Min <= min){
                     best_epoch = i;
                     min = Min;
                 }
@@ -235,53 +234,45 @@ void read_n_h(FILE* fp_nav, pnav_head nav_h)
         if (strstr(lable, "RINEX VERSION / TYPE")) {
             nav_h->ver = strtonum(buff, 0, 9);
             strncpy((nav_h->type), buff + 20, 15);
-            continue;
-        }
+            continue;}
         else if (strstr(lable, "GPSA")) {
             nav_h->ION_GPSA[0] = strtonum(buff, 6, 12);
             nav_h->ION_GPSA[1] = strtonum(buff, 6 + 12, 12);
             nav_h->ION_GPSA[2] = strtonum(buff, 6 + 12 + 12, 12);
             nav_h->ION_GPSA[3] = strtonum(buff, 6 + 12 + 12 + 12, 12);
-            continue;
-        }
+            continue;}
         else if (strstr(lable, "GPSB")) {
             nav_h->ION_GPSB[0] = strtonum(buff, 6, 12);
             nav_h->ION_GPSB[1] = strtonum(buff, 6 + 12, 12);
             nav_h->ION_GPSB[2] = strtonum(buff, 6 + 12 + 12, 12);
             nav_h->ION_GPSB[3] = strtonum(buff, 6 + 12 + 12 + 12, 12);
-            continue;
-        }
+            continue;}
         else if (strstr(lable, "BDSA")) {
             nav_h->ION_BDSA[0] = strtonum(buff, 6, 12);
             nav_h->ION_BDSA[1] = strtonum(buff, 6 + 12, 12);
             nav_h->ION_BDSA[2] = strtonum(buff, 6 + 12 + 12, 12);
             nav_h->ION_BDSA[3] = strtonum(buff, 6 + 12 + 12 + 12, 12);
-            continue;
-        }
+            continue;}
         else if (strstr(lable, "BDSB")) {
             nav_h->ION_BDSB[0] = strtonum(buff, 6, 12);
             nav_h->ION_BDSB[1] = strtonum(buff, 6 + 12, 12);
             nav_h->ION_BDSB[2] = strtonum(buff, 6 + 12 + 12, 12);
             nav_h->ION_BDSB[3] = strtonum(buff, 6 + 12 + 12 + 12, 12);
-            continue;
-        }
+            continue;}
         else if (strstr(lable, "BDUT")) {
             nav_h->BDUT[0] = strtonum(buff, 5, 17);
             nav_h->BDUT[1] = strtonum(buff, 5 + 17, 16);
             nav_h->BDUT[2] = strtonum(buff, 5 + 17 + 16, 7);
             nav_h->BDUT[3] = strtonum(buff, 5 + 17 + 16 + 7, 5);
-            continue;
-        }
+            continue;}
         else if (strstr(lable, "GPUT")) {
             nav_h->GPUT[0] = strtonum(buff, 5, 17);
             nav_h->GPUT[1] = strtonum(buff, 5 + 17, 16);
             nav_h->GPUT[2] = strtonum(buff, 5 + 17 + 16, 7);
             nav_h->GPUT[3] = strtonum(buff, 5 + 17 + 16 + 7, 5);
-            continue;
-        }
+            continue;}
         else if (strstr(lable, "LEAP SECONDS")) {
-            nav_h->leap = (int)strtonum(buff, 4, 2);
-        }
+            nav_h->leap = (int)strtonum(buff, 4, 2);}
         else if (strstr(lable, "END OF HEADER"))
             break;
     }
@@ -533,8 +524,8 @@ void read_n_b(FILE* fp_nav, pnav_body nav_b)
                     nav_b[i_g].sa1 = strtonum(buff, 23 + 19, 19);
                     nav_b[i_g].Dos = strtonum(buff, 23 + 19 + 19, 19);
 
-                    nav_b[i_g].TOE = JDUTC2GPST(
-                        UTCTime2JD(nav_b[i_g].TOC_Y, nav_b[i_g].TOC_M, nav_b[i_g].TOC_D,
+                    nav_b[i_g].TOE = jdutc2gpst(
+                        utctime2jd(nav_b[i_g].TOC_Y, nav_b[i_g].TOC_M, nav_b[i_g].TOC_D,
                             nav_b[i_g].TOC_H, nav_b[i_g].TOC_Min, nav_b[i_g].TOC_Sec)
                     );
                     fgets(buff, MAXRINEX, fp_nav);

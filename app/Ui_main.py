@@ -18,6 +18,8 @@ import Config_file as config
 import Func_callback as func
 
 ### Std
+import threading
+
 from tkinter import ttk
 from PIL import ImageTk
 from base64 import b64decode
@@ -39,9 +41,27 @@ def instancePRO(hwndparent, cfg_get_, func_):
 def instanceVIE(hwndparent, func_):
     vie.VIEWGUI(hwndparent, func_)
 
-def instanceABO(hwndparemt, cfg_get_):
-    abo.ABODUI(hwndparemt, cfg_get_)
+def instanceABO(hwndparemt, cfg_get_, func_):
+    abo.ABODUI(hwndparemt, cfg_get_, func_)
 
+def _instanceOPT(hwndparemt, cfg_get_, func_):
+    T = threading.Thread(target=lambda :instanceOPT(hwndparemt, cfg_get_, func_))
+    T.start()
+
+def _instancePRO(hwndparemt, cfg_get_, func_):
+    T = threading.Thread(target=lambda :instancePRO(hwndparemt, cfg_get_, func_))
+    T.start()
+
+def _instanceVIE(hwndparemt, func_):
+    T = threading.Thread(target=lambda :instanceVIE(hwndparemt, func_))
+    T.start()
+
+def _instanceABO(hwndparemt, cfg_get_, func_):
+    T = threading.Thread(target=lambda :instanceABO(hwndparemt, cfg_get_, func_))
+    T.start()
+
+
+# noinspection PyUnusedLocal,PyProtectedMember
 class MAINGUI:
     def  __init__(self, hwnd_, func_):
         # init
@@ -230,7 +250,7 @@ class MAINGUI:
         ### Help > About
         helpmenu.add_command(
             label="About",
-            command=lambda :instanceABO(self.hwnd, cfg_get)
+            command=lambda :instanceABO(self.hwnd, cfg_get, self.func)
         )
         topmenu.add_cascade(label="Help", menu=helpmenu)
 

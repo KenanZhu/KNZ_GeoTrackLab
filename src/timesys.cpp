@@ -11,7 +11,7 @@ using namespace std;
  * \param sec: Second of 
  * \return GPS: Second of week
  */
-double Time2GPST(int y, int m, int d, double h, int min, double sec)
+double time2gpst(int y, int m, int d, double h, int min, double sec)
 {
     if (m > 2)
     {
@@ -38,7 +38,7 @@ double Time2GPST(int y, int m, int d, double h, int min, double sec)
  * \param JD_UTCSU: JD of UTC(SU) time
  * \return GPS: Second of week
  */
-double JDUTC2GPST(double JD_UTCSU)
+double jdutc2gpst(double JD_UTCSU)
 {
     double n;//Leap second
 
@@ -66,7 +66,7 @@ double JDUTC2GPST(double JD_UTCSU)
  * \param sec: Second of UTC time
  * \return JD:
  */
-double UTCTime2JD(int y, int m, int d, double h, int min, double sec)
+double utctime2jd(int y, int m, int d, double h, int min, double sec)
 {
     if (m > 2)
     {

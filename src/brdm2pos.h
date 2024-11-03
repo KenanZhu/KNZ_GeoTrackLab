@@ -8,6 +8,9 @@
 #include <time.h>
 
 #endif // _BRDM2POS_H_
+
+#define KNZ_GTL_VER   "1.5.5.0"
+
 /* CALCU CONST*/
 #define C_V     299792458               /* Speed of light (m/s) */
 #define GM      398600500000000         /*  */
@@ -121,9 +124,6 @@ typedef struct stations{//
     double X;
     double Y;
     double Z;
-    double B;
-    double L;
-    double H;
     double delta_TR;
 }stations;
 
@@ -306,32 +306,86 @@ typedef struct obs_body{//Body data of file of obs
     double obs_glo[30][26];/* GLONASS obs data */
 }obs_body, * pobs_body;
 
+typedef struct lsq_part {
+    double* l;
+    double* m;
+    double* n;
+    double* o;
+    double* B;
+    double* P;
+    double* L;
+    double* x;
+}lsq_part;
+
+typedef struct acct_obs {
+    double Per1[30];
+    double Per2[30];
+    double sclk[30];
+    int freq1;
+    int freq2;
+
+    acct_obs() = default;
+}acct_obs;
+
 //Contain in timesys.cpp
-extern double JDUTC2GPST(double);
-extern double Time2GPST(int, int, int, double, int, double);
-extern double UTCTime2JD(int, int, int, double, int, double);
+extern double jdutc2gpst(double JD_UTCSU);
+extern double time2gpst(int y, int m, int d, double h, int min, double sec);
+extern double utctime2jd(int y, int m, int d, double h, int min, double sec);
+//Contain in martix.cpp
+extern double* mat(int n, int m);
+extern int* imat(int n, int m);
+extern double* zeros(int n, int m);
+extern double* eye(int n);
+extern double dot(const double* va, const double* vb, int n);
+extern double norm(const double* va, int n);
+extern void cross3(const double* va, const double* vb, double* vc);
+extern int normv3(const double* va, double* vb);
+extern void matcpy(double* A, const double* B, int n, int m);
+extern void matmul(const char* tr, int n, int k, int m, double alpha,
+    const double* A, const double* B, double beta, double* C);
+extern int matinv(double* A, int n);
+extern int solve(const char* tr, const double* A, const double* Y, int n,
+    int m, double* X);
+extern stations designmat(pobs_head obs_h, acct_obs obs,
+    double* l, double* m, double* n, double* o,
+    double* B, double* P, double* L,
+    double X, double Y, double Z, int satnum, int ionopt, int tropopt,
+    int GNSS);
+extern int lsq(const double* BtP, const double* L, const double* B, int n, int m, double* x,
+    double* Q);
+extern void matprint(const double A[], int n, int m, int p, int q);
 //Contain in coordtrans.cpp
-extern double  deg2rad(double);
-extern double  rad2deg(double);
-extern rah  rahcal(rah, double, double, double);
-extern enu blh2enu(enu, double, double, double, double, double);
-extern blh xyz2blh(blh, double, double, double);
+extern double deg2rad(double deg);
+extern double rad2deg(double rad);
+extern rah rahcal(rah rah, double E, double N, double U);
+extern enu blh2enu(enu enu, double stationB, double stationL,
+    double deltax, double deltay, double deltaz);
+extern blh xyz2blh(blh blh, double X, double Y, double Z);
+extern rah xyz2rah(pos_ts pos_t, pobs_head obs_h);
+extern void pz90towgs84(double X, double Y, double Z);
 //Contain in readrnx.cpp
-extern int  getsatnum(FILE*);
-extern int  get_epochnum(FILE*);
+extern int getsatnum(FILE*);
+extern int get_epochnum(FILE*);
 extern void freeobs_e(pobs_epoch, pobs_body);
-extern int  type2code(int, char buff[MAXRINEX]);
-extern int  code2type(int, int, int typearr[36]);
-extern int  select_epoch(double, int, pnav_body, int, int);
+extern int type2code(int, char buff[MAXRINEX]);
+extern int code2type(int, int, int typearr[36]);
+extern int select_epoch(double, int, pnav_body, int, int);
 //Contain in readrnx.cpp/read
 extern void read_n_h(FILE*, pnav_head);
 extern void read_n_b(FILE*, pnav_body);
 extern void read_o_h(FILE*, pobs_head);
 extern void read_o_eb(FILE*, pobs_head, pobs_epoch, pobs_body);
 //Contain in solutionout.cpp
-extern FILE* outputheader(pobs_head, char obs_path[MAXPATH], char nav_path[MAXPATH], char res_path[MAXPATH]);
-extern void outputbodydata(pobs_head, pobs_body, pos_ts, rah, FILE*, int, int, int);
+extern FILE* headerout(pobs_head obs_h, char obs_path[MAXPATH], char nav_path[MAXPATH], char res_path[MAXPATH]);
+extern void solution(FILE* res_file, pobs_head obs_h, double X, double Y, double Z);
+extern void outdata(blh blh, FILE* res_file, int sPRN, int GNSS);
 //Entry function
-extern "C" _declspec(dllexport) double brdm2pos(char nav_path[MAXPATH], char obs_path[MAXPATH], char res_path[MAXPATH],
-    int GNSS, int Hangle);
+extern "C" _declspec(dllexport) double brdm2pos(
+    char nav_path[MAXPATH],
+    char obs_path[MAXPATH],
+    char res_path[MAXPATH],
+    int GNSS,
+    int Hangle,
+    int ionopt,
+    int tropopt);
 

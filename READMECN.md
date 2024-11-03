@@ -10,15 +10,12 @@
 支持GNSS：
 * GPS：卫星位置解算&接收机定位
 * Galileo：卫星位置解算&接收机定位
-* GLONASS：卫星位置解算
-* 北斗/Compass：卫星位置解算
+* GLONASS：卫星位置解算(OINP)
+* 北斗/Compass：卫星位置解算(OINP)
 
 支持定位方式
 * 伪距定位
 * (OINP)
-
-特色功能：
-* 实现卫星轨道3D显示
 
 # 主要介绍
 ## 程序介绍
@@ -35,6 +32,13 @@
 * 自 2024 年 10 月 5 日起，Matlab 项目将不再考虑。[ADIN 2024/10/5]
 
 ## 项目更新
+
+更新: 2024/10/31:
+1. KNZ_GeoTrackLab: 修复一些bug, 优化UI逻辑.
+2. KNZ_GeoTrackLab: 移除3D绘图功能。
+2. KNZ_GeoTrackLab: 合并功能并专一化.
+3. KNZ_GeoTrackLab: 新增: 
+                        卫星轨迹投影图（还未实现功能化）。
 
 更新: 2024/10/31:
 1. KNZ_GeoTrackLab: 修复一些bug, 优化UI逻辑.

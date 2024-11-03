@@ -8,7 +8,6 @@
 #
 #
 #-----------------------------------------------------------------#
-
 ### Std
 import threading
 
@@ -58,6 +57,10 @@ class CALLBACK:
         for i in self.outdir:
             if self.outdir.get(i):
                 self.outvar += (self.outdir.get(i),)
+        ### Const value
+        global blank, C_V
+        blank = ' '
+        C_V = 299792458
 
     @staticmethod
     def Move_center(hwnd, win_x, win_y):
@@ -158,7 +161,8 @@ class CALLBACK:
                 self.cfg_get.set('Options_Draw', 'U_Line', str(entry2.get()))
                 self.cfg.save_config()
 
-    def Dir_or_name_get(self, path, mode):
+    @staticmethod
+    def Dir_or_name_get(path, mode):
         # -------------------------------------------------------------------------------
         # >
         # Method:
@@ -259,8 +263,8 @@ class CALLBACK:
                              path + '/*.sp')
             self.cfg.save_config()
 
-    def AskOrNotCheck(self,
-                      AskOrNotCheckVar,
+    @staticmethod
+    def AskOrNotCheck(AskOrNotCheckVar,
                       AskDirectorySelectBox,
                       AskDirectorySelectButton):
         # -------------------------------------------------------------------------------
@@ -316,7 +320,7 @@ class CALLBACK:
 
         directory = self.Dir_or_name_get(directory, 1)
         syssign = self.system.get(int(self.cfg_get['Options_Calc']['sat_system']))
-        resname = syssign + '-' + self.Dir_or_name_get(obspath,0) + 'sp'
+        resname = syssign + '-' + self.Dir_or_name_get(obspath,0) + 'ksln'
         respath = (directory + resname)
 
         ExecuteState.config(text='Processing...... file : %s' %resname)
@@ -327,8 +331,10 @@ class CALLBACK:
             navpath.encode(),
             obspath.encode(),
             respath.encode(),
-            int(self.cfg_get['Options_Calc']['sat_system']),
-            int(self.cfg_get['Options_Calc']['elev_angle'])
+            int(self.cfg_get['Options_Calc']['Sat_system']),
+            int(self.cfg_get['Options_Calc']['Elev_angle']),
+            int(self.cfg_get['Options_Calc']['Iono_Model']),
+            int(self.cfg_get['Options_Calc']['Trop_Model'])
             ):
             case  0.0:
                 ExecuteState.config(text='Generated successfully ! file : %s' %resname)
@@ -357,3 +363,7 @@ class CALLBACK:
                                                              AskOrNotCheckVar,
                                                              DirectorySelectBoxVar))
         T.start()
+
+
+
+

@@ -13,9 +13,10 @@
 import tkinter as tk
 
 class ABODUI:
-    def __init__(self, hwndparent, cfg_get):
+    def __init__(self, hwndparent, cfg_get, func):
         # init
         # -------------------------------------------------------------------------------
+        self.func = func
         self.cfg_get = cfg_get
         self.hwndparent = hwndparent
 

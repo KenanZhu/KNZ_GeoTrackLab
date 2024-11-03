@@ -17,9 +17,6 @@ Support method of orientation
 * Pseudorange positioning
 * (OINP)
 
-Features ：
-* Realize 3D display of satellite orbit
-
 # MAIN INTRO
 ## Program intro
   ### About KNZ_GeoTrackLab
@@ -35,6 +32,13 @@ Features ：
   * As of October 5, 2024, Matlab project will no longer be considered.[ADIN 2024/10/5] 
   
 ## Project Update
+
+Update: 2024/11/03:
+1.  KNZ_GeoTrackLab: Fix some bug, Modify some UI logic.
+2.  KNZ_GeoTrackLab: Remove 3D plot function.
+3.  KNZ_GeoTrackLab: Merge some functions and concentrated.
+4.  KNZ_GeoTrackLab: New added:
+                                Sat track projection ui(not ok on function).
 
 Update: 2024/10/31:
 1.  KNZ_GeoTrackLab: Fix some bug, Modify some UI logic.
