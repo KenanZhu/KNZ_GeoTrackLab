@@ -33,16 +33,12 @@
 
 ## 项目更新
 
-更新：2024/10/31:
-1. KNZ_GeoTrackLab: 修复一些bug, 优化UI逻辑。
-2. KNZ_GeoTrackLab: 完成卫星轨迹绘图功能。
-
 更新: 2024/10/31:
 1. KNZ_GeoTrackLab: 修复一些bug, 优化UI逻辑。
 2. KNZ_GeoTrackLab: 移除3D绘图功能。
 2. KNZ_GeoTrackLab: 合并功能并专一化。
 3. KNZ_GeoTrackLab: 新增: 
-                        卫星轨迹投影图（还未实现功能化）。
+                        卫星轨迹投影图。
 
 更新: 2024/10/31:
 1. KNZ_GeoTrackLab: 修复一些bug, 优化UI逻辑.
