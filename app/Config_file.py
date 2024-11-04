@@ -1,13 +1,15 @@
+#  @ File : Config_file.py
 #
+#  Copyright (c) 2024 KenanZhu. All Right Reserved.
 #
+#  @ Author       : KenanZhu
+#  @ Time         : 2024/11/04
+#  @ Brief        : Initialize the configuration file.
+#  #
+#  @ IDE          : PyCharm 2024.2.1 (Community Edition)
 #
-#
-#
-#
-#
-#
-#
-#-----------------------------------------------------------------#
+#  ----------------------------------------------------------------------------------------
+
 from configparser import ConfigParser
 
 class Configinit:
@@ -20,8 +22,8 @@ class Configinit:
     def load_config(self):
         # -------------------------------------------------------------------------------
         # >
-        # Method:
-        # Brief :
+        # Method: load_config
+        # Brief : Load config file, if not exist, regenerate the config.
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
         try:
@@ -33,8 +35,8 @@ class Configinit:
     def get_config(self):
         # -------------------------------------------------------------------------------
         # >
-        # Method:
-        # Brief :
+        # Method: get_config
+        # Brief : Capture config instance handle.
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
         self.config.read(self.config_filepath)
@@ -43,8 +45,8 @@ class Configinit:
     def create_config(self):
         # -------------------------------------------------------------------------------
         # >
-        # Method:
-        # Brief :
+        # Method: create_config
+        # Brief : Generate the initial config file.
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
         ### Config for software info
@@ -81,8 +83,8 @@ class Configinit:
     def save_config(self):
         # -------------------------------------------------------------------------------
         # >
-        # Method:
-        # Brief :
+        # Method: save_config
+        # Brief : Save changes of config file.
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
         with open(self.config_filepath, 'w') as configfile:

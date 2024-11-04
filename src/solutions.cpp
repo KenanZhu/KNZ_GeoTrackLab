@@ -35,7 +35,7 @@ static double trosaastamoinen(pobs_head obs_h, double elev)
     return dtrop;
 }
 /*Tropshere correction with hopfiled model*/
-static double trohopfiled(pobs_head obs_h, double elev)
+static double trohopfield(pobs_head obs_h, double elev)
 {
     double P0, e0, T0, deltaSd, deltaSw, dtropd, dtropw, dtrop;
     double B = obs_h->apB, L = obs_h->apL, H = obs_h->apH;
@@ -99,7 +99,7 @@ static double restcorr(pobs_head obs_h, acct_obs obs, int ionopt, int tropopt,
     }
     switch (tropopt) {
     case 0:break;
-    case 1:dtrop = trohopfiled(obs_h, elev); break;
+    case 1:dtrop = trohopfield(obs_h, elev); break;
     case 2:dtrop = trosaastamoinen(obs_h, elev); break;
     }
     P = P - diono - dtrop;
@@ -139,7 +139,8 @@ stations designmat(pobs_head obs_h, acct_obs obs,
         R = sqrt(
             pow(l[i] - X, 2) +
             pow(m[i] - Y, 2) +
-            pow(n[i] - Z, 2));
+            pow(n[i] - Z, 2)
+        );
         B[i + satnum * 0] = -(l[i] - X) / R;
         B[i + satnum * 1] = -(m[i] - Y) / R;
         B[i + satnum * 2] = -(n[i] - Z) / R;
@@ -167,6 +168,7 @@ FILE* headerout(pobs_head obs_h,
     fclose(result_file_clear);
     FILE* result_file = fopen(res_path, "a+");
     fprintf(result_file, ">GENERATE PROGRAM   : KNZ_GeoTrackLab ver%s\n", KNZ_GTL_VER);
+    fprintf(result_file, " GENERATE SOURCE    : %.10s\n", obs_h->marker);
     fprintf(result_file, " GENERATE TYPE      : Satellite  Position\n");
     fprintf(result_file, " GENERATE TIME      : %s", ctime(&gen_time));
     fprintf(result_file, " OBS FILE PATH      : %s\n", obs_path);

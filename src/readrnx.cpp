@@ -603,6 +603,10 @@ void read_o_h(FILE* fp_obs, pobs_head obs_h)
             strncpy(obs_h->type, buff + 20, 30);
             continue;
         }
+        else if (strstr(lable, "MARKER NAME")) {
+            strncpy(obs_h->marker, buff + 0, 10);
+            continue;
+        }
         else if (strstr(lable, "APPROX POSITION XYZ")) {
             obs_h->apX = strtonum(buff, 0, 14);
             obs_h->apY = strtonum(buff, 0 + 14, 14);

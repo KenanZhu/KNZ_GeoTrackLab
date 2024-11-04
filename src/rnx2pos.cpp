@@ -286,7 +286,7 @@ int sat_pos_cal(pobs_head obs_h, pobs_epoch obs_e, pobs_body obs_b,
                 break;
             case GAL:
                 obs.Per1[k] = obs_b->obs_gal[j][code2type(C1, obs_h->obstypenum_gal, obs_h->obscode_gal)];
-                obs.Per2[k] = obs_b->obs_gal[j][code2type(C2, obs_h->obstypenum_gal, obs_h->obscode_gal)];
+                obs.Per2[k] = obs_b->obs_gal[j][code2type(C6, obs_h->obstypenum_gal, obs_h->obscode_gal)];
                 obs.freq1 = FREQ1; obs.freq2 = FREQ6;
                 break;
             case GLO:
@@ -325,7 +325,9 @@ int sat_pos_cal(pobs_head obs_h, pobs_epoch obs_e, pobs_body obs_b,
             stop++;
         }solution(solu, obs_h, ap_X, ap_Y, ap_Z);
     }
-    else;
+    else {
+        fprintf(solu,"\nRec:insufficient quantity of sat, sat=%d",k);
+    }
     free(in_lsq.l); free(in_lsq.m); free(in_lsq.n); free(in_lsq.o);
     free(in_lsq.B); free(in_lsq.P); free(in_lsq.L);
     return 1;

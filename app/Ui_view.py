@@ -1,13 +1,14 @@
+#  @ File : UI_view.py
 #
+#  Copyright (c) 2024 KenanZhu. All Right Reserved.
 #
+#  @ Author       : KenanZhu
+#  @ Time         : 2024/11/04
+#  @ Brief        : File viewer window class.
+#  #
+#  @ IDE          : PyCharm 2024.2.1 (Community Edition)
 #
-#
-#
-#
-#
-#
-#
-#-----------------------------------------------------------------#
+#  ----------------------------------------------------------------------------------------
 
 ### Std
 from PIL import ImageTk

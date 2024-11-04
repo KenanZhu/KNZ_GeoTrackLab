@@ -237,6 +237,7 @@ typedef struct nav_body{//Body data of file of nav: GPS	BeiDou Galileo GLONASS
 typedef struct obs_head{//Header data of file of obs
     double ver;
     char type[30];
+    char marker[10];
 
     double apX;
     double apY;

@@ -1,13 +1,14 @@
+#  @ File : UI_main.py
 #
+#  Copyright (c) 2024 KenanZhu. All Right Reserved.
 #
+#  @ Author       : KenanZhu
+#  @ Time         : 2024/11/04
+#  @ Brief        : Main window class.
+#  #
+#  @ IDE          : PyCharm 2024.2.1 (Community Edition)
 #
-#
-#
-#
-#
-#
-#
-#-----------------------------------------------------------------#
+#  ----------------------------------------------------------------------------------------
 
 ### Self
 import Ui_view as vie
@@ -28,6 +29,8 @@ from matplotlib.backends.backend_tkagg import (
 
 import tkinter as tk
 import tkinter.font as tkfont
+import cartopy.crs as ccrs
+#import cartopy.feature as cfeature
 import matplotlib as mpl
 mpl.use('TkAgg')
 import matplotlib.pyplot as plt
@@ -201,12 +204,17 @@ class MAINGUI:
         ### File > Open... > Open Pos Solution
         openmenu.add_command(
             label="Open Pos Solution",
-            accelerator='Ctrl+S'
+            accelerator='Ctrl+S',
+            command=lambda :self.func._OpenkslnFile(
+                self.ex,self.nx,self.ux,self.satn,self.satvisb,
+                self.canvas0,self.canvas1,self.plotstate)
         )
         ### File > Open... > Open Sat Solution
         openmenu.add_command(
             label="Open Sat Solution",
-            accelerator='Ctrl+S'
+            accelerator='Ctrl+S',
+            command=lambda :self.func._Plot2polar(
+                self.sattrack,self.plotstate,self.canvas2)
         )
         ### File > Open... > Open RINEX
         openmenu.add_command(
@@ -380,13 +388,21 @@ class MAINGUI:
 
         plt.rc('font', family='Segoe UI')
         fig = plt.figure()
-        self.sattrack = fig.add_subplot(projection='polar')
+        self.sattrack = fig.add_subplot(
+            projection=ccrs.PlateCarree()
+        )
+        self.sattrack.coastlines(resolution='110m')
+        self.sattrack.gridlines()
         fig.subplots_adjust(
             left=0,
             bottom=0.03,
             right=1,
             top=0.95
         )
+        for spine in ['right', 'left']:
+            self.sattrack.spines[spine].set_visible(False)
+        self.sattrack.set_facecolor('#f5f5f5')
+
         self.canvas2 = FigureCanvasTkAgg(fig, self.Figurefrm_Sky)
         self.canvas2.draw()
         self.canvas2.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=tk.YES)

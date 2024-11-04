@@ -1,13 +1,14 @@
+#  @ File : UI_processor.py
 #
+#  Copyright (c) 2024 KenanZhu. All Right Reserved.
 #
+#  @ Author       : KenanZhu
+#  @ Time         : 2024/11/04
+#  @ Brief        : RINEX file processor window class.
+#  #
+#  @ IDE          : PyCharm 2024.2.1 (Community Edition)
 #
-#
-#
-#
-#
-#
-#
-#-----------------------------------------------------------------#
+#  ----------------------------------------------------------------------------------------
 
 ### Std
 from tkinter import ttk

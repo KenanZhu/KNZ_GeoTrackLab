@@ -10,8 +10,8 @@ Support version of RINEX:
 Support system of GNSS:
 * GPS: Satellite position solving & Receiver station orientation
 * Galileo : Satellite position solving & Receiver station orientation
-* GLONASS : Satellite position solving
-* BeiDou / Compass : Satellite position solving
+* GLONASS : Satellite position solving(OINP)
+* BeiDou / Compass : Satellite position solving(OINP)
 
 Support method of orientation
 * Pseudorange positioning
@@ -32,6 +32,10 @@ Support method of orientation
   * As of October 5, 2024, Matlab project will no longer be considered.[ADIN 2024/10/5] 
   
 ## Project Update
+
+Update: 2024/11/03:
+1.  KNZ_GeoTrackLab: Fix some bug, Modify some UI logic.
+2.  KNZ_GeoTrackLab: Complete the function of Satellite track plot.
 
 Update: 2024/11/03:
 1.  KNZ_GeoTrackLab: Fix some bug, Modify some UI logic.

@@ -1,24 +1,31 @@
+#  @ File : Func_callback.py
 #
+#  Copyright (c) 2024 KenanZhu. All Right Reserved.
 #
+#  @ Author       : KenanZhu
+#  @ Time         : 2024/11/04
+#  @ Brief        : Interactive control callback function class.
+#  #
+#  @ IDE          : PyCharm 2024.2.1 (Community Edition)
 #
-#
-#
-#
-#
-#
-#
-#-----------------------------------------------------------------#
+#  ----------------------------------------------------------------------------------------
+
 ### Std
+import math
 import threading
 
+import numpy as np
 import ctypes as ct
 import tkinter as tk
+import cartopy.crs as ccrs
 
 from tkinter import filedialog
 from tkinter import colorchooser
 
 class CALLBACK:
     def __init__(self, cfg, cfg_get):
+        # init
+        # -------------------------------------------------------------------------------
         self.cfg = cfg
         self.cfg_get = cfg_get
 
@@ -58,20 +65,19 @@ class CALLBACK:
             if self.outdir.get(i):
                 self.outvar += (self.outdir.get(i),)
         ### Const value
-        global blank, C_V
+        global blank
         blank = ' '
-        C_V = 299792458
 
     @staticmethod
     def Move_center(hwnd, win_x, win_y):
         # -------------------------------------------------------------------------------
         # >
-        # Method:
-        # Brief :
-        # Param :
-        #
-        #
-        # Return:
+        # Method: Move_Ccenter
+        # Brief : Move the window to the center of screen.
+        # Param : hwnd : instance handle of window
+        #         win_x: the x size of window
+        #         win_y: the y size of window
+        # Return: none
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
         position_x = int((hwnd.winfo_screenwidth() - win_x) / 2)
@@ -81,12 +87,13 @@ class CALLBACK:
     def Calcuconfirm(self, cionbox, ctrobox, canglebox, systemv):
         # -------------------------------------------------------------------------------
         # >
-        # Method:
-        # Brief :
-        # Param :
-        #
-        #
-        # Return:
+        # Method: Calcuconfirm
+        # Brief : Callback function of confirm button of options window
+        # Param : cionbox  : iono combobox handle
+        #         ctrobox  : trop combobox handle
+        #         canglabox: elev angle of sat combobox handle
+        #         systemv  : sat system button handle
+        # Return: none
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
 
@@ -99,13 +106,13 @@ class CALLBACK:
     def Colorchoose(self, hwndparent, i, colorlab, mode):
         # -------------------------------------------------------------------------------
         # >
-        # Method:
-        # Brief :
-        # Param : hwndparent :
-        #         i          : 0==e & 1==n & 2==u & 3==satn
-        #         colorlab   :
-        #         mode       :
-        # Return:
+        # Method: Colorchoose
+        # Brief : Color choose card of options callback function.
+        # Param : hwndparent : instance handle of options window
+        #         i          : 0==e    & 1==n      & 2==u & 3==satn
+        #         colorlab   : color label handle
+        #         mode       : 0==undo & 1==select & 2==save change
+        # Return: none
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
         match mode:
@@ -141,13 +148,13 @@ class CALLBACK:
     def Linewchoose(self, entry0, entry1, entry2, mode):
         # -------------------------------------------------------------------------------
         # >
-        # Method:
-        # Brief :
+        # Method: Linewchoose
+        # Brief : Line width selection of plot.
         # Param : entry0 : spinbox handle
         #         entry1 : spinbox handle
         #         entry2 : spinbox handle
         #         mode   : 0==undo & 1==confirm
-        # Return:
+        # Return: none
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
         match mode:
@@ -165,11 +172,11 @@ class CALLBACK:
     def Dir_or_name_get(path, mode):
         # -------------------------------------------------------------------------------
         # >
-        # Method:
-        # Brief :
-        # Param : path :
+        # Method: Dir_or_name_get
+        # Brief : Get the filedir or filename form path
+        # Param : path : file path
         #         mode : 0==get file name & 1==get file dir
-        # Return:
+        # Return: mode==0 return filename,mode==1 return file dir
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
         global nameend, filename, filedir
@@ -198,10 +205,11 @@ class CALLBACK:
     def GetObsFilePath(self, hwndparent, ObsFileSelectBox):
         # -------------------------------------------------------------------------------
         # >
-        # Method:
-        # Brief :
-        # Param :
-        # Return:
+        # Method: GetObsFilePath
+        # Brief : Get obs file path of RINEX.
+        # Param : hwndparent       : instance handle of RINEX processor window
+        #         ObsFileSelectBox : string value of path combobox
+        # Return: none
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
         path = filedialog.askopenfilename(
@@ -222,10 +230,11 @@ class CALLBACK:
     def GetNavFilePath(self, hwndparent, NavFileSelectBox):
         # -------------------------------------------------------------------------------
         # >
-        # Method:
-        # Brief :
-        # Param :
-        # Return:
+        # Method: GetNavFilePath
+        # Brief : Get nav file path of RINEX.
+        # Param : hwndparent       : instance handle of RINEX processor window
+        #         NavFileSelectBox : string value of path combobox
+        # Return: none
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
         path = filedialog.askopenfilename(
@@ -247,10 +256,11 @@ class CALLBACK:
     def AskDirectory(self, hwndparent, AskDirectorySelectBox):
         # -------------------------------------------------------------------------------
         # >
-        # Method:
-        # Brief :
-        # Param :
-        # Return:
+        # Method: AskDirectory
+        # Brief : Get the output file diectory.
+        # Param : hwndparent            : instance handle of RINEX processor window
+        #         AskDirectorySelectBox : instance handle of dir combox
+        # Return: none
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
         path = filedialog.askdirectory(parent=hwndparent)
@@ -269,10 +279,12 @@ class CALLBACK:
                       AskDirectorySelectButton):
         # -------------------------------------------------------------------------------
         # >
-        # Method:
-        # Brief :
-        # Param :
-        # Return:
+        # Method: AskOrNotCheck
+        # Brief : Check the file diectory.
+        # Param : AskOrNotCheckVar         : button int value
+        #         AskDirectorySelectBox    : instance handle of dir combobox
+        #         AskDirectorySelectButton : instance handle dir select button
+        # Return: none
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
         if AskOrNotCheckVar.get() == 0:
@@ -290,11 +302,8 @@ class CALLBACK:
                     DirectorySelectBoxVar):
         # -------------------------------------------------------------------------------
         # >
-        # Method:
-        # Brief :
-        # Param :
-        #
-        # Return:
+        # Method: ExecuteFile
+        # Brief : Execute RINEX file into .ksln.
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
         statemsg = ""
@@ -363,6 +372,227 @@ class CALLBACK:
                                                              AskOrNotCheckVar,
                                                              DirectorySelectBoxVar))
         T.start()
+
+    def OpenkslnFile(self,
+                     explot,nxplot,uxplot,satnplot,visbplot,
+                     canvas0,canvas1,plotstate):
+        # -------------------------------------------------------------------------------
+        # >
+        # Method: OpenkslnFile
+        # Brief : Plot by open ksln as pos solution.
+        # Author: @KenanZhu All Right Reserved.
+        # -------------------------------------------------------------------------------
+        path = filedialog.askopenfilename(title='Open as Pos Solution',
+                                          filetypes=[('Solution File(*.ksln)', '*.ksln'),
+                                                     ('All Files', '*.*')])
+        with open(path,'r')as f:
+            while 1:
+                line = f.readline()
+                if line.find('APPROX POSITION XYZ')>=0:
+                    apx = float(line[22:35])
+                    apy = float(line[35:48])
+                    apz = float(line[48:61])
+                elif line.find('APPROX POSITION BLH')>=0:
+                    apb = float(line[22:35])
+                    apl = float(line[35:48])
+                    aph = float(line[48:61])
+                    S = np.array([
+                        [-math.sin(apl)              , math.cos(apl)              , 0],
+                        [-math.sin(apb)*math.cos(apl),-math.sin(apb)*math.sin(apl),math.cos(apb)],
+                        [ math.cos(apb)*math.cos(apl), math.cos(apb)*math.sin(apl),math.sin(apb)]
+                    ])
+                elif line.find('INTERVAL')>=0:
+                    ive = float(line[22:27])
+                elif line.find('<END OF HEADER')>=0:
+                    plotstate.config(text="Reading...")
+                    break
+
+            satnum = 0
+            ENU = np.empty((3,0))
+            EPO = np.empty((1,0))
+            NUM = np.empty((1,0))
+            while 1:
+                line = f.readline()
+                if line[0:1]=='>':
+                    satnum = 0
+                    EPO = np.hstack((EPO,[[float(line[1:6])]]))
+                    plotstate.config(text='Reading...%5d/%5d Mode: Single solving'
+                                          %(int(line[1:6]), int(86400/ive)))
+
+                elif line[0:1]==self.system.get(int(
+                        self.cfg_get['Options_Calc']['sat_system']
+                )) and line.find('END')==-1 and line.find('Rec')==-1:
+                    satnum += 1
+
+                elif line.find('Rec:')>=0:
+                    if line.find('insufficient')>=0:
+                        ds = np.array([
+                            [0],
+                            [0],
+                            [0]
+                        ])
+                    else:
+                        ds = np.array([
+                            [float(line[ 4:13])],
+                            [float(line[14:23])],
+                            [float(line[24:33])]
+                        ])
+                    ENU = np.hstack((ENU,S@ds))
+                    NUM = np.hstack((NUM,[[satnum]]))
+                elif line.find('END')>=0:
+                    # plot on the e
+                    # -------------------------------------------------------------------
+                    explot.clear()
+                    nxplot.clear()
+                    uxplot.clear()
+                    # plot on n
+                    # -------------------------------------------------------------------
+                    explot.plot(
+                        EPO[0, :],
+                        ENU[0, :],
+                        marker='.',
+                        linestyle=':',
+                        ms=self.cfg_get['Options_Draw']['e_line'],
+                        color=self.cfg_get['Options_Draw']['e_color'],
+                        linewidth=self.cfg_get['Options_Draw']['e_line'],
+                    )
+                    explot.set_title(' E-W(m)', x=0.02, y=0, fontsize=8)
+                    explot.grid(True, linestyle='--', alpha=0.7)
+                    # plot on u
+                    # -------------------------------------------------------------------
+                    nxplot.plot(
+                        EPO[0, :],
+                        ENU[1, :],
+                        marker='.',
+                        linestyle=':',
+                        ms=self.cfg_get['Options_Draw']['n_line'],
+                        color=self.cfg_get['Options_Draw']['n_color'],
+                        linewidth=self.cfg_get['Options_Draw']['n_line'],
+                    )
+                    nxplot.set_title(' N-S(m)', x=0.02, y=0, fontsize=8)
+                    nxplot.grid(True, linestyle='--', alpha=0.7)
+                    # plot on u
+                    # -------------------------------------------------------------------
+                    uxplot.plot(
+                        EPO[0, :],
+                        ENU[2, :],
+                        marker='.',
+                        linestyle=':',
+                        ms=self.cfg_get['Options_Draw']['u_line'],
+                        color=self.cfg_get['Options_Draw']['u_color'],
+                        linewidth=self.cfg_get['Options_Draw']['u_line'],
+                    )
+                    uxplot.set_title(' U-D(m)', x=0.02, y=0, fontsize=8)
+                    uxplot.grid(True, linestyle='--', alpha=0.7)
+                    canvas0.draw()
+
+                    satnplot.clear()
+                    satnplot.plot(
+                        EPO[0, :],
+                        NUM[0, :],
+                        ms=5,
+                        marker='|',
+                        linewidth=0,
+                        linestyle=None,
+                        color=self.cfg_get['Options_Draw']['sat_amount_color'],
+                    )
+                    satnplot.set_title('Valid Satellite Numbers', loc='left', fontsize=8)
+                    satnplot.set_xlabel('Epochs')
+                    satnplot.grid(True, linestyle='--', alpha=0.7)
+
+                    canvas1.draw()
+
+                    f.close()
+
+                    plotstate.config(text="Plot   form: %s" % path)
+                    break
+
+    def _OpenkslnFile(self,
+                      explot, nxplot, uxplot, satnplot, visbplot,
+                      canvas0, canvas1, plotstate):
+        T = threading.Thread(
+            target=lambda :self.OpenkslnFile(
+            explot,nxplot,uxplot,satnplot,visbplot,
+            canvas0,canvas1,plotstate)
+                             )
+        T.start()
+
+    def Plot2polar(self, sattrack, plotstate, canvas2):
+        # -------------------------------------------------------------------------------
+        # >
+        # Method:
+        # Brief :
+        # Author: @KenanZhu All Right Reserved.
+        # -------------------------------------------------------------------------------
+        path = filedialog.askopenfilename(title='Open as Sat Solution',
+                                          filetypes=[('Solution File(*.ksln)', '*.ksln'),
+                                                     ('All Files', '*.*')])
+        sattrack.clear()
+        with open(path,'r') as f:
+            while 1:
+                line = f.readline()
+                if line.find('APPROX POSITION BLH')>=0:
+                    apb = math.degrees( float(line[22:35]) )
+                    apl = math.degrees( float(line[35:48]) )
+                elif line.find('GENERATE SOURCE')>=0:
+                    marker = line[22:26]
+                elif line.find('INTERVAL')>=0:
+                    ive = float(line[22:27])
+                elif line.find('<END OF HEADER')>=0:
+                    break
+            epoch = 0
+            while 1:
+                line =f.readline()
+                if line[0:1]=='>':
+                    epoch = int(line[1:6])
+                    plotstate.config(text="Reading...%5d/%5d Mode: Sat track plot"
+                                          %(int(line[1:6]), int(86400/ive)))
+                elif line[0:1]==blank:
+                    pass
+                elif line[0:1]==self.system.get(int(self.cfg_get['Options_Calc']['sat_system'])
+                                                ) and line.find('END')==-1 and line.find('Rec')==-1:
+                    if epoch % 10==0:
+                        b = math.degrees( float(line[ 4:13]) )
+                        l = math.degrees( float(line[14:23]) )
+                        sattrack.scatter(l,b,color='b',s=2,
+                                         transform=ccrs.PlateCarree())
+                    else:
+                        pass
+
+                elif line.find('END')>=0:
+                    plotstate.config(text="Plotting...")
+
+                    sattrack.scatter(apl, apb, color='#ff8000', s=35,
+                                     transform=ccrs.PlateCarree())
+                    sattrack.text(apl, apb, blank * 4 + marker, color='#ff8000',
+                                  fontsize=12, fontweight='bold'
+                                  , transform=ccrs.PlateCarree())
+                    plotstate.config(text="Reading...")
+
+                    sattrack.coastlines(resolution='110m')
+                    sattrack.gridlines()
+                    canvas2.draw()
+
+                    plotstate.config(text="Done !")
+
+    def _Plot2polar(self, sattrack, plotstate, canvas2):
+        T = threading.Thread(
+            target=lambda :self.Plot2polar(sattrack, plotstate, canvas2)
+        )
+        T.start()
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
