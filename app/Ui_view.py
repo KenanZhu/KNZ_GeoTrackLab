@@ -23,10 +23,12 @@ class VIEWGUI:
     def __init__(self, hwndparent, func):
         # init
         # -------------------------------------------------------------------------------
+        self.text = None
         self.func = func
         self.hwndparent = hwndparent
 
         self.view = None
+        self.f_path=""
 
         self.initGUI()
 
@@ -224,8 +226,13 @@ class VIEWGUI:
         ### File > Oprn File
         filemenu.add_command(
             label="Open File",
-            command=lambda: self.View_windowshow(text, self.view),
-            accelerator='Ctrl+F'
+            command=self.View_windowshow,
+            accelerator='Ctrl+O'
+        )
+        filemenu.add_command(
+            label="Save File",
+            command=self.Save_file,
+            accelerator='Ctrl+S'
         )
         ### File > Exit
         filemenu.add_command(
@@ -242,7 +249,7 @@ class VIEWGUI:
         xbar = tk.Scrollbar(self.view, orient=tk.HORIZONTAL)
         xbar.pack(side=tk.BOTTOM, fill=tk.X)
 
-        text = tk.Text(
+        self.text = tk.Text(
             self.view,
             xscrollcommand=xbar.set,
             yscrollcommand=ybar.set,
@@ -251,23 +258,57 @@ class VIEWGUI:
             autoseparators=False,
             wrap='none'
         )
-        text.pack(side=tk.TOP, fill=tk.BOTH)
-        ybar.config(command=text.yview)
-        xbar.config(command=text.xview)
+        self.text.pack(side=tk.TOP, fill=tk.BOTH)
+        ybar.config(command=self.text.yview)
+        xbar.config(command=self.text.xview)
 
-    def View_windowshow(self, text, view):
+    def View_windowshow(self):
         # -------------------------------------------------------------------------------
         # >
         # Method:
         # Brief :
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
-        f_path = filedialog.askopenfilename(parent=view)
-        if not f_path:
+        self.f_path = filedialog.askopenfilename(parent=self.view)
+        if not self.f_path:
             return 0
-        self.view.title('Viewing: %s' % f_path)
-        text.delete('1.0', 'end')
-        with open(f_path, 'r') as f:
+        self.view.title('Viewing: %s' % self.f_path)
+        self.text.delete('1.0', 'end')
+        with open(self.f_path,'r',encoding='utf-8') as f:
             fcon = f.read()
-            text.insert('insert', fcon)
-            text.config()
+            self.text.insert('insert', fcon)
+            self.text.config()
+
+    def Save_file(self):
+        filecontent = self.text.get('1.0', 'end')
+        if self.f_path:
+            with open(self.f_path,'w',encoding='utf-8') as f:
+                f.write(filecontent)
+        else:
+            if not filecontent=='\n':
+                fpath = filedialog.asksaveasfilename(
+                    defaultextension='.txt',
+                    parent=self.view,
+                    title='Save As:',
+                    filetypes=[
+                        ('Text File(*.txt)', '*.txt'),
+                        ('Solution File(*.ksln)', '*.ksln'),
+                        ('Solution File(*.ssln)', '*.ssln'),
+                        ('RINEX NAV File(*.*nav.*.hnav.*.gnav.*.qnav.*.*n.*.*g.*.*h.*.*q.*.*p)',
+                         '*.*nav;*.hnav;*.gnav;*.qnav;*.*n;*.*g;*.*h;*.*q;*.*p'),
+                        ('RINEX OBS File(*.o*.*.*obs.*.*d)', '*.*o;*.*obs;*.*d'),
+                        ('All Files', '*.*')])
+                try:
+                    with open(fpath,'w',encoding='utf-8') as f:
+                        f.write(filecontent)
+                except FileNotFoundError:
+                    self.view.title('Fail to save: %s' % fpath)
+                    return
+                self.view.title('Viewing : %s' % fpath)
+            else:
+                return
+
+
+
+
+

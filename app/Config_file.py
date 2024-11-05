@@ -67,6 +67,10 @@ class Configinit:
         self.config.set('Options_Draw', 'N_Line', '0.80')
         self.config.set('Options_Draw', 'U_Line', '0.80')
         self.config.set('Options_Draw', 'Sat_Amount_Color', '#0080FF')
+        self.config.set('Options_Draw', 'Enable of track', '0')
+        self.config.set('Options_Draw', 'Track of prn', '01')
+        self.config.set('Options_Draw', 'Track sample rate','10')
+
         ### Config for input path
         self.config.add_section('Input_Obs_Path')
         self.config.set('Input_Obs_Path', '0', '')

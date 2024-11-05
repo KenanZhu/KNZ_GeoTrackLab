@@ -158,7 +158,7 @@ stations designmat(pobs_head obs_h, acct_obs obs,
     return sta;
 }
 /*Output the header data of satllite position solution*/
-FILE* headerout(pobs_head obs_h,
+FILE* headerout(pobs_head obs_h, int mode,
     char obs_path[MAXPATH], char nav_path[MAXPATH], char res_path[MAXPATH])
 {
     time_t gen_time;
@@ -169,7 +169,9 @@ FILE* headerout(pobs_head obs_h,
     FILE* result_file = fopen(res_path, "a+");
     fprintf(result_file, ">GENERATE PROGRAM   : KNZ_GeoTrackLab ver%s\n", KNZ_GTL_VER);
     fprintf(result_file, " GENERATE SOURCE    : %.10s\n", obs_h->marker);
-    fprintf(result_file, " GENERATE TYPE      : Satellite  Position\n");
+
+    if (mode != 1); fprintf(result_file, " GENERATE TYPE      : Position Resolve\n");
+    if (mode == 0); fprintf(result_file, " GENERATE TYPE      : Satellite  Position\n");
     fprintf(result_file, " GENERATE TIME      : %s", ctime(&gen_time));
     fprintf(result_file, " OBS FILE PATH      : %s\n", obs_path);
     fprintf(result_file, " NAV FILE PATH      : %s\n", nav_path);

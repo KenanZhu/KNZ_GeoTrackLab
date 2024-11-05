@@ -32,6 +32,14 @@ Support method of orientation
   * As of October 5, 2024, Matlab project will no longer be considered.[ADIN 2024/10/5] 
   
 ## Project Update
+Update: 2024/11/03:
+1. KNZ_GeoTrackLab: Fix some bug, Optimize UI logic。
+2. KNZ_GeoTrackLab: New added function of save and change
+                    file for View.
+3. KNZ_GeoTrackLab: Sat track projection plot changed as
+                    Mecator projection and relize the display
+                    by dynamic, sat prn selection, selection of
+                    sample rate/inteval of plot.
 
 Update: 2024/11/03:
 1.  KNZ_GeoTrackLab: Fix some bug, Modify some UI logic.

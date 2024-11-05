@@ -377,7 +377,7 @@ extern void read_n_b(FILE*, pnav_body);
 extern void read_o_h(FILE*, pobs_head);
 extern void read_o_eb(FILE*, pobs_head, pobs_epoch, pobs_body);
 //Contain in solutionout.cpp
-extern FILE* headerout(pobs_head obs_h, char obs_path[MAXPATH], char nav_path[MAXPATH], char res_path[MAXPATH]);
+extern FILE* headerout(pobs_head obs_h, int mode, char obs_path[MAXPATH], char nav_path[MAXPATH], char res_path[MAXPATH]);
 extern void solution(FILE* res_file, pobs_head obs_h, double X, double Y, double Z);
 extern void outdata(blh blh, FILE* res_file, int sPRN, int GNSS);
 //Entry function
@@ -388,5 +388,6 @@ extern "C" _declspec(dllexport) double brdm2pos(
     int GNSS,
     int Hangle,
     int ionopt,
-    int tropopt);
+    int tropopt,
+    int genmode);
 

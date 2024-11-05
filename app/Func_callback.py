@@ -84,7 +84,8 @@ class CALLBACK:
         position_y = int((hwnd.winfo_screenheight() - win_y) / 2)
         hwnd.geometry(f'{win_x}x{win_y}+{position_x}+{position_y}')
 
-    def Calcuconfirm(self, cionbox, ctrobox, canglebox, systemv):
+    def Calcuconfirm(self, cionbox, ctrobox, canglebox, systemv,
+                     trackprn, trackint):
         # -------------------------------------------------------------------------------
         # >
         # Method: Calcuconfirm
@@ -101,6 +102,9 @@ class CALLBACK:
         self.cfg_get.set('Options_Calc', 'Trop_model', self.trocormode.get(ctrobox.get()))
         self.cfg_get.set('Options_Calc', 'Elev_angle', canglebox.get())
         self.cfg_get.set('Options_Calc', 'Sat_system', str(systemv.get()))
+        self.cfg_get.set('Options_Draw', 'Track of prn', trackprn.get())
+        self.cfg_get.set('Options_Draw', 'Track sample rate', trackint.get())
+
         self.cfg.save_config()
 
     def Colorchoose(self, hwndparent, i, colorlab, mode):
@@ -306,6 +310,7 @@ class CALLBACK:
         # Brief : Execute RINEX file into .ksln.
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
+        exten = "ksln"
         statemsg = ""
         state3 = ["","",""]
         if not ObsSelectBoxVar.get():
@@ -327,9 +332,12 @@ class CALLBACK:
         if AskOrNotCheckVar.get():
             directory = DirectorySelectBoxVar.get()
 
+
         directory = self.Dir_or_name_get(directory, 1)
         syssign = self.system.get(int(self.cfg_get['Options_Calc']['sat_system']))
-        resname = syssign + '-' + self.Dir_or_name_get(obspath,0) + 'ksln'
+        if int(self.cfg_get['Options_Draw']['Enable of track'])==1:
+            exten="ssln"
+        resname = syssign + '-' + self.Dir_or_name_get(obspath,0) + exten
         respath = (directory + resname)
 
         ExecuteState.config(text='Processing...... file : %s' %resname)
@@ -343,7 +351,8 @@ class CALLBACK:
             int(self.cfg_get['Options_Calc']['Sat_system']),
             int(self.cfg_get['Options_Calc']['Elev_angle']),
             int(self.cfg_get['Options_Calc']['Iono_Model']),
-            int(self.cfg_get['Options_Calc']['Trop_Model'])
+            int(self.cfg_get['Options_Calc']['Trop_Model']),
+            int(self.cfg_get['Options_Draw']['Enable of track'])
             ):
             case  0.0:
                 ExecuteState.config(text='Generated successfully ! file : %s' %resname)
@@ -385,6 +394,7 @@ class CALLBACK:
         path = filedialog.askopenfilename(title='Open as Pos Solution',
                                           filetypes=[('Solution File(*.ksln)', '*.ksln'),
                                                      ('All Files', '*.*')])
+        if not path: return
         with open(path,'r')as f:
             while 1:
                 line = f.readline()
@@ -524,56 +534,105 @@ class CALLBACK:
         # Brief :
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
+        if self.cfg_get['Options_Draw']['Enable of track']=='0':
+            plotstate.config(text="Track plot is not avaliable now, Please enable it.")
+            return
+        satprn = int(self.cfg_get['Options_Draw']['Track of prn'])
+        anirat = int(self.cfg_get['Options_Draw']['Track sample rate'])
+        system = self.system.get(int(self.cfg_get['Options_Calc']['sat_system']))
+
         path = filedialog.askopenfilename(title='Open as Sat Solution',
-                                          filetypes=[('Solution File(*.ksln)', '*.ksln'),
+                                          filetypes=[('Solution File(*.ssln)', '*.ssln'),
                                                      ('All Files', '*.*')])
+        if not path: return
         sattrack.clear()
+
+        sattrack.coastlines(resolution='110m')
+        sattrack.gridlines()
+
         with open(path,'r') as f:
             while 1:
                 line = f.readline()
+
                 if line.find('APPROX POSITION BLH')>=0:
                     apb = math.degrees( float(line[22:35]) )
                     apl = math.degrees( float(line[35:48]) )
+                    plotstate.config(text="Plotting...")
+
+                    sattrack.scatter(
+                        apl,
+                        apb,
+                        color='r',
+                        s=35,
+                        transform=ccrs.PlateCarree()
+                    )
+                    sattrack.text(
+                        apl,
+                        apb,
+                        blank*4+marker,
+                        color='k',
+                        fontsize=10,
+                        fontweight='bold',
+                        transform=ccrs.PlateCarree()
+                    )
+                    canvas2.draw()
+
                 elif line.find('GENERATE SOURCE')>=0:
                     marker = line[22:26]
+
                 elif line.find('INTERVAL')>=0:
                     ive = float(line[22:27])
+
                 elif line.find('<END OF HEADER')>=0:
                     break
+
             epoch = 0
             while 1:
                 line =f.readline()
-                if line[0:1]=='>':
-                    epoch = int(line[1:6])
-                    plotstate.config(text="Reading...%5d/%5d Mode: Sat track plot"
-                                          %(int(line[1:6]), int(86400/ive)))
-                elif line[0:1]==blank:
+                if line[0:1]==blank:
                     pass
-                elif line[0:1]==self.system.get(int(self.cfg_get['Options_Calc']['sat_system'])
-                                                ) and line.find('END')==-1 and line.find('Rec')==-1:
-                    if epoch % 10==0:
+
+                elif line[0:1]==system and line.find('END')==-1 and line.find('Rec')==-1:
+                    epoch = int(line[41:46])
+                    plotstate.config(text="Reading...%5d/%5d Mode: Sat track plot"
+                                          % (int(line[41:46]), int(86400 / ive)))
+
+                    if int(line[1:3])==satprn and epoch%anirat==0:
                         b = math.degrees( float(line[ 4:13]) )
                         l = math.degrees( float(line[14:23]) )
-                        sattrack.scatter(l,b,color='b',s=2,
-                                         transform=ccrs.PlateCarree())
+                        sattrack.scatter(
+                            l,
+                            b,
+                            color='b',
+                            s=2,
+                            transform=ccrs.PlateCarree()
+                        )
+                        canvas2.draw()
+                        text = sattrack.text(
+                        l,
+                        b,
+                        4*blank+system+'%02d'%satprn,
+                        color='k',
+                        fontsize=10,
+                        fontweight='bold',
+                        transform=ccrs.PlateCarree()
+                        )
+                        point = sattrack.scatter(
+                            l,
+                            b,
+                            color='b',
+                            s=10,
+                            transform=ccrs.PlateCarree()
+                        )
+                        canvas2.draw()
+                        text.remove()
+                        point.remove()
                     else:
                         pass
 
                 elif line.find('END')>=0:
-                    plotstate.config(text="Plotting...")
-
-                    sattrack.scatter(apl, apb, color='#ff8000', s=35,
-                                     transform=ccrs.PlateCarree())
-                    sattrack.text(apl, apb, blank * 4 + marker, color='#ff8000',
-                                  fontsize=12, fontweight='bold'
-                                  , transform=ccrs.PlateCarree())
-                    plotstate.config(text="Reading...")
-
-                    sattrack.coastlines(resolution='110m')
-                    sattrack.gridlines()
-                    canvas2.draw()
-
-                    plotstate.config(text="Done !")
+                    plotstate.config(text="Done ! Track plot form: sys=%s sat=%2d interval=%2d"
+                                          %(system, satprn, anirat))
 
     def _Plot2polar(self, sattrack, plotstate, canvas2):
         T = threading.Thread(

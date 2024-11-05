@@ -42,6 +42,13 @@ class OPTGUI:
         self.canglebox = None
         self.angleentry = None
 
+        self.enable = tk.IntVar()
+        self.trackprn = tk.StringVar()
+        self.trackint = tk.StringVar()
+        self.enable.set(int(self.cfg_get['Options_Draw']['Enable of track']))
+        self.trackprn.set(self.cfg_get['Options_Draw']['Track of prn'])
+        self.trackint.set(self.cfg_get['Options_Draw']['Track sample rate'])
+
         self.ulinewidth = None
         self.nlinewidth = None
         self.elinewidth = None
@@ -59,9 +66,9 @@ class OPTGUI:
         self.opthwnd = tk.Toplevel(self.hwndparent)
         self.opthwnd.title("Options")
         self.opthwnd.resizable(0,0)
-        self.func.Move_center(self.opthwnd,320,250)
-        self.opthwnd.minsize(320,250)
-        self.opthwnd.maxsize(320,250)
+        self.func.Move_center(self.opthwnd,320,280)
+        self.opthwnd.minsize(320,280)
+        self.opthwnd.maxsize(320,280)
         ### Set icon
         icon_ico = (b'AAABAAEAICAAAAAAIACoEAAAFgAAACgAAAAgAAAAQAAAAAEAIAAAAAAAABAAADjsAAA47AAAAAA'
                      b'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
@@ -184,6 +191,9 @@ class OPTGUI:
         # Elev option frame
         # -------------------------------------------------------------------------------
         self.HANGOPT()
+        # Sat track opt frame
+        # -------------------------------------------------------------------------------
+        self.TRACK()
         # Syst option frame
         # -------------------------------------------------------------------------------
         self.SYSOPT()
@@ -252,6 +262,55 @@ class OPTGUI:
         self.canglebox.current(int(pos))
         self.canglebox.pack(side=tk.RIGHT,anchor='e')
 
+    def TRACK(self):
+        # -------------------------------------------------------------------------------
+        # >
+        # Method: TRACK
+        # Brief : Plot satellite track by dynamic
+        # Author: @KenanZhu All Right Reserved.
+        # -------------------------------------------------------------------------------
+        SattrackFrm = ttk.LabelFrame(self.CalcuFrame, text='Satellite Track', labelanchor='nw')
+        SattrackFrm.pack(side=tk.TOP, expand=tk.YES, padx='0px', pady='2px', fill=tk.BOTH)
+
+        Sattrack = ttk.Frame(SattrackFrm)
+        Sattrack.pack(side=tk.TOP, expand=tk.YES, padx='0px', pady='0px',fill=tk.X)
+
+        SatenableBut = ttk.Checkbutton(
+            Sattrack,
+            text='Enable : (s)PRN / Plot Interval',
+            variable=self.enable,
+            onvalue=1,
+            offvalue=0,
+            command=lambda :self.func.AskOrNotCheck(
+                self.enable,
+                RateEntry,
+                SattprnEntry
+            )
+        )
+        SatenableBut.pack(side=tk.LEFT, anchor='w')
+        # Interval of track plot
+        # -------------------------------------------------------------------------------
+        RateEntry = ttk.Entry(
+            Sattrack,
+            width=8,
+            state=tk.DISABLED,
+            textvariable=self.trackint,
+        )
+        RateEntry.pack(side=tk.RIGHT, anchor='e')
+        # SPRN of satellite ploted
+        # -------------------------------------------------------------------------------
+        SattprnEntry = ttk.Entry(
+            Sattrack,
+            width=8,
+            state=tk.DISABLED,
+            textvariable=self.trackprn
+        )
+        SattprnEntry.pack(side=tk.RIGHT, anchor='e')
+
+        if self.enable.get():
+            RateEntry.config(state=tk.NORMAL)
+            SattprnEntry.config(state=tk.NORMAL)
+
     def SYSOPT(self):
         # -------------------------------------------------------------------------------
         # >
@@ -296,7 +355,7 @@ class OPTGUI:
         LineoptFrame.pack(side=tk.RIGHT, expand=tk.YES, padx='1px', pady='1px', fill=tk.Y)
 
         EFrame = tk.Frame(LineoptFrame)
-        EFrame.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='0px')
+        EFrame.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='2px')
         elinewopt = tk.Label(
             EFrame,
             text='Eline:',
@@ -315,7 +374,7 @@ class OPTGUI:
         self.elinewidth.pack(side=tk.LEFT, expand=tk.YES, padx='1px', pady='0px')
 
         NFrame = tk.Frame(LineoptFrame)
-        NFrame.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='0px')
+        NFrame.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='2px')
         nlinewopt = tk.Label(
             NFrame,
             text='Nline:',
@@ -334,7 +393,7 @@ class OPTGUI:
         self.nlinewidth.pack(side=tk.LEFT, expand=tk.YES, padx='1px', pady='0px')
 
         UFrame = tk.Frame(LineoptFrame)
-        UFrame.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='0px')
+        UFrame.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='2px')
         ulinewopt = tk.Label(
             UFrame,
             text='Uline:',
@@ -353,7 +412,7 @@ class OPTGUI:
         self.ulinewidth.pack(side=tk.LEFT, expand=tk.YES, padx='1px', pady='0px')
 
         LineCon = tk.Frame(LineoptFrame)
-        LineCon.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='0px')
+        LineCon.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='2px')
         linewre = ttk.Button(
             LineCon,
             text='Undo',
@@ -375,11 +434,11 @@ class OPTGUI:
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
         # Satnum plot options#
-        SatvisFrame = ttk.LabelFrame(self.PlotFrame, text='Satn configs', labelanchor='nw')
+        SatvisFrame = ttk.LabelFrame(self.PlotFrame, text='SatN configs', labelanchor='nw')
         SatvisFrame.pack(side=tk.BOTTOM, expand=tk.YES, padx='1px', pady='1px', fill=tk.BOTH)
 
         SatnFrame = tk.Frame(SatvisFrame)
-        SatnFrame.pack(side=tk.LEFT, expand=tk.YES, padx='5px', pady='0px')
+        SatnFrame.pack(side=tk.LEFT, expand=tk.YES, padx='5px', pady='2px')
         satncollab = tk.Label(
             SatnFrame,
             width=5,
@@ -409,7 +468,7 @@ class OPTGUI:
         LinecolorFrame.pack(side=tk.LEFT, expand=tk.YES, padx='1px', pady='1px', fill=tk.Y)
 
         EFrame = tk.Frame(LinecolorFrame)
-        EFrame.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='0px')
+        EFrame.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='2px')
         ecollab = tk.Label(
             EFrame,
             width=5,
@@ -425,7 +484,7 @@ class OPTGUI:
         ecolopt.pack(side=tk.RIGHT, expand=tk.YES, padx='5px', pady='0px')
 
         NFrame = tk.Frame(LinecolorFrame)
-        NFrame.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='0px')
+        NFrame.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='2px')
         ncollab = tk.Label(
             NFrame,
             width=5,
@@ -443,7 +502,7 @@ class OPTGUI:
 
 
         UFrame = tk.Frame(LinecolorFrame)
-        UFrame.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='0px')
+        UFrame.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='2px')
         ucollab = tk.Label(
             UFrame,
             width=5,
@@ -460,7 +519,7 @@ class OPTGUI:
         ucolopt.pack(side=tk.RIGHT, expand=tk.YES, padx='5px', pady='0px')
 
         ColorCon = tk.Frame(LinecolorFrame)
-        ColorCon.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='0px')
+        ColorCon.pack(side=tk.TOP, expand=tk.YES, padx='5px', pady='2px')
         colorcon = ttk.Button(
             ColorCon,
             text='Undo',
@@ -496,7 +555,10 @@ class OPTGUI:
             text='Confirm',
             width=10,
             command=lambda :[
-                self.func.Colorchoose(self.opthwnd, 0, None, 2),
+                self.func.Colorchoose(
+                    self.opthwnd,
+                    0, None, 2
+                ),
                 self.func.Linewchoose(
                     self.elinewidth,
                     self.nlinewidth,
@@ -507,8 +569,13 @@ class OPTGUI:
                     self.cionbox,
                     self.ctrobox,
                     self.canglebox,
-                    self.systemv
+                    self.systemv,
+                    self.trackprn,
+                    self.trackint
                 ),
+                self.cfg_get.set('Options_Draw',
+                                 'Enable of track',
+                                 '%d' % self.enable.get()),
                 self.opthwnd.destroy()
             ]
         )

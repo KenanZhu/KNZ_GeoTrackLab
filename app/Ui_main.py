@@ -389,7 +389,7 @@ class MAINGUI:
         plt.rc('font', family='Segoe UI')
         fig = plt.figure()
         self.sattrack = fig.add_subplot(
-            projection=ccrs.PlateCarree()
+            projection=ccrs.Mercator()
         )
         self.sattrack.coastlines(resolution='110m')
         self.sattrack.gridlines()

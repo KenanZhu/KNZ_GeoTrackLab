@@ -32,6 +32,12 @@
 * 自 2024 年 10 月 5 日起，Matlab 项目将不再考虑。[ADIN 2024/10/5]
 
 ## 项目更新
+更新：2024/11/05:
+1. KNZ_GeoTrackLab: 修复一些bug, 优化UI逻辑。
+2. KNZ_GeoTrackLab: 为View文本编辑器增添保存修改功能。
+3. KNZ_GeoTrackLab: 卫星轨迹投影图更改为墨卡托投影，
+                    并实现动画显示，卫星号选择，绘
+                    制采样频率选择。
 
 更新: 2024/10/31:
 1. KNZ_GeoTrackLab: 修复一些bug, 优化UI逻辑。

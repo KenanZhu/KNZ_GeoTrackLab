@@ -294,7 +294,7 @@ int sat_pos_cal(pobs_head obs_h, pobs_epoch obs_e, pobs_body obs_b,
                 obs.Per2[k] = obs_b->obs_glo[j][code2type(C2, obs_h->obstypenum_glo, obs_h->obscode_glo)];
                 obs.freq1 = FREQ1_GLO; obs.freq2 = FREQ2_GLO;
                 break;}
-            
+
             outdata(in_blh, solu, sPRN, GNSS); k++;
         };
     }
@@ -332,6 +332,64 @@ int sat_pos_cal(pobs_head obs_h, pobs_epoch obs_e, pobs_body obs_b,
     free(in_lsq.B); free(in_lsq.P); free(in_lsq.L);
     return 1;
 }
+/**/
+int sat_cal(pnav_body nav_b, pobs_head obs_h, FILE* solu,int satnum, int GNSS) {
+
+    int ii, i, sPRN=0;
+    double Min, min, Weeksec=0, Beginsec, STOP;
+
+    pos_ts pos = { 0 };
+    blh in_blh = { 0 };
+
+    Beginsec = time2gpst(
+        obs_h->f_y,
+        obs_h->f_m,
+        obs_h->f_d,
+        obs_h->f_h,
+        obs_h->f_min,
+        obs_h->f_sec
+    );
+
+    for (i = 0; i < satnum; i++) {
+
+        switch (GNSS){
+        case GPS:if (nav_b[i].sPRN_GPS == -1) { continue; }
+            Weeksec =
+                fabs(sPRN - nav_b[i].sPRN_GPS) > 0 ? Beginsec : Weeksec;
+            sPRN = nav_b[i].sPRN_GPS;
+            STOP = 3600.0;
+            break;
+        case BDS:if (nav_b[i].sPRN_BDS == -1) { continue; }
+            Weeksec =
+                fabs(sPRN - nav_b[i].sPRN_BDS) > 0 ? Beginsec : Weeksec;
+            sPRN = nav_b[i].sPRN_BDS;
+            STOP = 1800.0;
+            break;
+        case GAL:if (nav_b[i].sPRN_GAL == -1) { continue; }
+            Weeksec =
+                fabs(sPRN - nav_b[i].sPRN_GAL) > 0 ? Beginsec : Weeksec;
+            sPRN = nav_b[i].sPRN_GAL;
+            STOP = 300.0;
+            break;
+        case GLO:if (nav_b[i].sPRN_GLO == -1) { continue; }
+            Weeksec =
+                fabs(sPRN - nav_b[i].sPRN_GLO) > 0 ? Beginsec : Weeksec;
+            sPRN = nav_b[i].sPRN_GLO;
+            STOP = 900.0;
+            break;
+        }
+
+        for (Weeksec; fabs(Weeksec-nav_b[i].TOE)<=3600.0; Weeksec += 30.0) {
+            if (Weeksec - Beginsec == 86400.0) {
+                break;
+            }
+            pos = sat_pos(sPRN, i, Weeksec, GNSS, nav_b, obs_h, pos);
+            in_blh = xyz2blh(in_blh, pos.X, pos.Y, pos.Z);
+            outdata(in_blh, solu, sPRN, GNSS);
+            fprintf(solu, ">>%05d", (int)(Weeksec-Beginsec)/30+1);
+        }
+    }return 0;
+}
 /**
  * The entrance of function.
  * 
@@ -339,6 +397,10 @@ int sat_pos_cal(pobs_head obs_h, pobs_epoch obs_e, pobs_body obs_b,
  * \param obs_path: The RINEX observation file's path
  * \param res_path: The satellite position solution output path
  * \param GNSS: GNSS code
+ * \param Hangle : 
+ * \param ionopt :
+ * \param troopt :
+ * \param genmode:
  * \return 
  *			-1 ,Can not open the nav file
  *			-2 ,Can not open the obs file
@@ -356,7 +418,8 @@ double brdm2pos(
     int GNSS,
     int Hangle,
     int ionopt,
-    int tropopt
+    int tropopt,
+    int genmode
 )
 {
     int satnum, epochnum, result = 0;
@@ -413,7 +476,13 @@ double brdm2pos(
         obs_h->apL = apblh.L;
         obs_h->apH = apblh.H;
 
-        FILE* solu = headerout(obs_h, obs_path, nav_path, res_path);
+        FILE* solu = headerout(obs_h, genmode, obs_path, nav_path, res_path);
+        if (genmode == 1) {
+            sat_cal(nav_b, obs_h, solu, satnum, GNSS);
+            fprintf(solu, "\nEND");
+            fclose(solu);
+            return 0;
+        }
 
         //Begin to calculate
         for (int i = 0; i < epochnum; i++) {
