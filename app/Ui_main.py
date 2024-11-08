@@ -30,7 +30,7 @@ from matplotlib.backends.backend_tkagg import (
 import tkinter as tk
 import tkinter.font as tkfont
 import cartopy.crs as ccrs
-#import cartopy.feature as cfeature
+import cartopy.io.shapereader as shp
 import matplotlib as mpl
 mpl.use('TkAgg')
 import matplotlib.pyplot as plt
@@ -62,7 +62,6 @@ def _instanceVIE(hwndparemt, func_):
 def _instanceABO(hwndparemt, cfg_get_, func_):
     T = threading.Thread(target=lambda :instanceABO(hwndparemt, cfg_get_, func_))
     T.start()
-
 
 # noinspection PyUnusedLocal,PyProtectedMember
 class MAINGUI:
@@ -395,9 +394,9 @@ class MAINGUI:
         self.sattrack.gridlines()
         fig.subplots_adjust(
             left=0,
-            bottom=0.03,
+            bottom=0.045,
             right=1,
-            top=0.95
+            top=0.90
         )
         for spine in ['right', 'left']:
             self.sattrack.spines[spine].set_visible(False)

@@ -391,13 +391,19 @@ class CALLBACK:
         # Brief : Plot by open ksln as pos solution.
         # Author: @KenanZhu All Right Reserved.
         # -------------------------------------------------------------------------------
+        system = self.system.get(int(self.cfg_get['Options_Calc']['sat_system']))
+
         path = filedialog.askopenfilename(title='Open as Pos Solution',
                                           filetypes=[('Solution File(*.ksln)', '*.ksln'),
                                                      ('All Files', '*.*')])
         if not path: return
+        if not path.find('.ksln'):
+            plotstate.config(text='Error : Unsupported format !')
+            return
         with open(path,'r')as f:
             while 1:
                 line = f.readline()
+                if not line: return
                 if line.find('APPROX POSITION XYZ')>=0:
                     apx = float(line[22:35])
                     apy = float(line[35:48])
@@ -416,23 +422,24 @@ class CALLBACK:
                 elif line.find('<END OF HEADER')>=0:
                     plotstate.config(text="Reading...")
                     break
-
             satnum = 0
             ENU = np.empty((3,0))
             EPO = np.empty((1,0))
             NUM = np.empty((1,0))
             while 1:
                 line = f.readline()
+                if not line: return
                 if line[0:1]=='>':
                     satnum = 0
                     EPO = np.hstack((EPO,[[float(line[1:6])]]))
                     plotstate.config(text='Reading...%5d/%5d Mode: Single solving'
                                           %(int(line[1:6]), int(86400/ive)))
 
-                elif line[0:1]==self.system.get(int(
-                        self.cfg_get['Options_Calc']['sat_system']
-                )) and line.find('END')==-1 and line.find('Rec')==-1:
-                    satnum += 1
+                elif line[0:1]==system:
+                    if not line.find('END')==-1: pass
+                    elif not line.find('Rec')==-1: pass
+                    else:
+                        satnum += 1
 
                 elif line.find('Rec:')>=0:
                     if line.find('insufficient')>=0:
@@ -449,7 +456,7 @@ class CALLBACK:
                         ])
                     ENU = np.hstack((ENU,S@ds))
                     NUM = np.hstack((NUM,[[satnum]]))
-                elif line.find('END')>=0:
+                if line.find('END')>=0:
                     # plot on the e
                     # -------------------------------------------------------------------
                     explot.clear()
@@ -509,7 +516,6 @@ class CALLBACK:
                     satnplot.set_title('Valid Satellite Numbers', loc='left', fontsize=8)
                     satnplot.set_xlabel('Epochs')
                     satnplot.grid(True, linestyle='--', alpha=0.7)
-
                     canvas1.draw()
 
                     f.close()
@@ -545,20 +551,18 @@ class CALLBACK:
                                           filetypes=[('Solution File(*.ssln)', '*.ssln'),
                                                      ('All Files', '*.*')])
         if not path: return
-        sattrack.clear()
-
-        sattrack.coastlines(resolution='110m')
-        sattrack.gridlines()
-
+        if not path.find('.ssln')>=0:
+            plotstate.config(text="Error : Unsupported format !")
+            return
         with open(path,'r') as f:
             while 1:
                 line = f.readline()
-
+                if not line: return
                 if line.find('APPROX POSITION BLH')>=0:
+                    sattrack.clear()
                     apb = math.degrees( float(line[22:35]) )
                     apl = math.degrees( float(line[35:48]) )
                     plotstate.config(text="Plotting...")
-
                     sattrack.scatter(
                         apl,
                         apb,
@@ -576,63 +580,68 @@ class CALLBACK:
                         transform=ccrs.PlateCarree()
                     )
                     canvas2.draw()
-
                 elif line.find('GENERATE SOURCE')>=0:
                     marker = line[22:26]
-
+                elif line.find('TIME OF FIRST OBS')>=0:
+                    yea =   int(line[22:26])
+                    mon =   int(line[27:29])
+                    day =   int(line[30:32])
+                    hou =   int(line[33:35])
+                    min =   int(line[36:38])
+                    sec = float(line[39:46])
                 elif line.find('INTERVAL')>=0:
                     ive = float(line[22:27])
-
                 elif line.find('<END OF HEADER')>=0:
+                    sattrack.coastlines(resolution='110m')
+                    sattrack.gridlines(draw_labels=True, dms=True, x_inline=False, y_inline=False)
+                    sattrack.set_title('Ground Track of %s%02d (GPST: %04d/%02d/%02d/%02d/%02d/%7.04f)'
+                                   %(system,satprn,yea,mon,day,hou,min,sec),
+                                       loc='left',fontsize=14,weight='bold')
                     break
-
-            epoch = 0
             while 1:
-                line =f.readline()
-                if line[0:1]==blank:
-                    pass
-
-                elif line[0:1]==system and line.find('END')==-1 and line.find('Rec')==-1:
-                    epoch = int(line[41:46])
-                    plotstate.config(text="Reading...%5d/%5d Mode: Sat track plot"
-                                          % (int(line[41:46]), int(86400 / ive)))
-
-                    if int(line[1:3])==satprn and epoch%anirat==0:
-                        b = math.degrees( float(line[ 4:13]) )
-                        l = math.degrees( float(line[14:23]) )
-                        sattrack.scatter(
-                            l,
-                            b,
-                            color='b',
-                            s=2,
-                            transform=ccrs.PlateCarree()
-                        )
-                        canvas2.draw()
-                        text = sattrack.text(
-                        l,
-                        b,
-                        4*blank+system+'%02d'%satprn,
-                        color='k',
-                        fontsize=10,
-                        fontweight='bold',
-                        transform=ccrs.PlateCarree()
-                        )
-                        point = sattrack.scatter(
-                            l,
-                            b,
-                            color='b',
-                            s=10,
-                            transform=ccrs.PlateCarree()
-                        )
-                        canvas2.draw()
-                        text.remove()
-                        point.remove()
-                    else:
-                        pass
-
-                elif line.find('END')>=0:
-                    plotstate.config(text="Done ! Track plot form: sys=%s sat=%2d interval=%2d"
-                                          %(system, satprn, anirat))
+                line = f.readline()
+                if not line: break
+                if line.find('END')>=0: break
+                if not str(line[ 0: 1])==system: continue
+                if not int(line[ 1: 3])==satprn: continue
+                if not int(line[41:46])%anirat==0: continue
+                plotstate.config(text="Reading...%5d/%5d Mode: Sat track plot"
+                                      % (int(line[41:46]), int(86400 / ive)))
+                # Judge twice
+                if not int(line[ 1: 3])==satprn:break
+                b = math.degrees( float(line[ 4:13]) )
+                l = math.degrees( float(line[14:23]) )
+                sattrack.scatter(
+                l,
+                b,
+                color='b',
+                s=2,
+                transform=ccrs.PlateCarree()
+                )
+                canvas2.draw()
+                
+                text = sattrack.text(
+                l,
+                b,
+                4*blank+system+'%02d'%satprn,
+                color='k',
+                fontsize=10,
+                fontweight='bold',
+                transform=ccrs.PlateCarree()
+                )
+                point = sattrack.scatter(
+                l,
+                b,
+                color='b',
+                s=10,
+                transform=ccrs.PlateCarree()
+                )
+                canvas2.draw()
+                text.remove()
+                point.remove()
+            plotstate.config(text="Done ! Track plot form: sys=%s sat=%2d interval=%2d"
+                                  % (system, satprn, anirat))
+            return
 
     def _Plot2polar(self, sattrack, plotstate, canvas2):
         T = threading.Thread(

@@ -1,10 +1,4 @@
 #include "brdm2pos.h"
-
-#define	MAXTOE_GPS		7200.0
-#define	MAXTOE_BDS		21600.0
-#define	MAXTOE_GAL		14400.0
-#define	MAXTOE_GLO		1800.0
-#define	MAXTOE_SBS		360.0
 using namespace std;
 /**
  * Find the nearest obs epoch with boardcast.
@@ -296,6 +290,7 @@ void read_n_b(FILE* fp_nav, pnav_body nav_b)
                 case 0:
                     nav_b[i_g].sPRN_BDS = -1;
                     nav_b[i_g].sPRN_GAL = -1;
+                    nav_b[i_g].sPRN_GLO = -1;
                     nav_b[i_g].sPRN_GPS = (int)strtonum(buff, 1, 2);
                     nav_b[i_g].TOC_Y = (int)strtonum(buff, 4, 4);
                     nav_b[i_g].TOC_M = (int)strtonum(buff, 9, 2);
@@ -368,6 +363,7 @@ void read_n_b(FILE* fp_nav, pnav_body nav_b)
                 case 0:
                     nav_b[i_g].sPRN_GPS = -1;
                     nav_b[i_g].sPRN_GAL = -1;
+                    nav_b[i_g].sPRN_GLO = -1;
                     nav_b[i_g].sPRN_BDS = (int)strtonum(buff, 1, 2);
                     nav_b[i_g].TOC_Y = (int)strtonum(buff, 4, 4);
                     nav_b[i_g].TOC_M = (int)strtonum(buff, 9, 2);
@@ -440,6 +436,7 @@ void read_n_b(FILE* fp_nav, pnav_body nav_b)
                 case 0:
                     nav_b[i_g].sPRN_BDS = -1;
                     nav_b[i_g].sPRN_GPS = -1;
+                    nav_b[i_g].sPRN_GLO = -1;
                     nav_b[i_g].sPRN_GAL = (int)strtonum(buff, 1, 2);
                     nav_b[i_g].TOC_Y = (int)strtonum(buff, 4, 4);
                     nav_b[i_g].TOC_M = (int)strtonum(buff, 9, 2);

@@ -336,7 +336,7 @@ int sat_pos_cal(pobs_head obs_h, pobs_epoch obs_e, pobs_body obs_b,
 int sat_cal(pnav_body nav_b, pobs_head obs_h, FILE* solu,int satnum, int GNSS) {
 
     int ii, i, sPRN=0;
-    double Min, min, Weeksec=0, Beginsec, STOP;
+    double Min, min, Weeksec=0, Beginsec, STOP=0;
 
     pos_ts pos = { 0 };
     blh in_blh = { 0 };
@@ -357,36 +357,36 @@ int sat_cal(pnav_body nav_b, pobs_head obs_h, FILE* solu,int satnum, int GNSS) {
             Weeksec =
                 fabs(sPRN - nav_b[i].sPRN_GPS) > 0 ? Beginsec : Weeksec;
             sPRN = nav_b[i].sPRN_GPS;
-            STOP = 3600.0;
+            STOP = TIMEGAP_GPS/2;
             break;
         case BDS:if (nav_b[i].sPRN_BDS == -1) { continue; }
             Weeksec =
                 fabs(sPRN - nav_b[i].sPRN_BDS) > 0 ? Beginsec : Weeksec;
             sPRN = nav_b[i].sPRN_BDS;
-            STOP = 1800.0;
+            STOP = TIMEGAP_BDS/2;
             break;
         case GAL:if (nav_b[i].sPRN_GAL == -1) { continue; }
             Weeksec =
                 fabs(sPRN - nav_b[i].sPRN_GAL) > 0 ? Beginsec : Weeksec;
             sPRN = nav_b[i].sPRN_GAL;
-            STOP = 300.0;
+            STOP = TIMEGAP_GAL/2;
             break;
         case GLO:if (nav_b[i].sPRN_GLO == -1) { continue; }
             Weeksec =
                 fabs(sPRN - nav_b[i].sPRN_GLO) > 0 ? Beginsec : Weeksec;
             sPRN = nav_b[i].sPRN_GLO;
-            STOP = 900.0;
+            STOP = TIMEGAP_GLO/2+18;
             break;
         }
+        for (Weeksec; fabs(Weeksec - nav_b[i].TOE) <= STOP; Weeksec += 30.0) {
+            if (Weeksec - Beginsec >= DAYSEC) break;
+            else if (Weeksec - Beginsec >= DAYSEC - STOP) STOP += STOP;
+            if (GNSS != GLO) pos = sat_pos(sPRN, i, Weeksec, GNSS, nav_b, obs_h, pos);
+            else if (GNSS == GLO) pos = glo_pos(i, Weeksec, nav_b, obs_h, pos);
 
-        for (Weeksec; fabs(Weeksec-nav_b[i].TOE)<=3600.0; Weeksec += 30.0) {
-            if (Weeksec - Beginsec == 86400.0) {
-                break;
-            }
-            pos = sat_pos(sPRN, i, Weeksec, GNSS, nav_b, obs_h, pos);
             in_blh = xyz2blh(in_blh, pos.X, pos.Y, pos.Z);
             outdata(in_blh, solu, sPRN, GNSS);
-            fprintf(solu, ">>%05d", (int)(Weeksec-Beginsec)/30+1);
+            fprintf(solu, ">>%05d", (int)(Weeksec - Beginsec) / 30 + 1);
         }
     }return 0;
 }

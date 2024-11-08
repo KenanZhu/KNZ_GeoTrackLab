@@ -108,6 +108,17 @@
 #define GLO     04
 #define SBAS    05
 
+#define	MAXTOE_GPS		7200.0
+#define	MAXTOE_BDS		21600.0
+#define	MAXTOE_GAL		14400.0
+#define	MAXTOE_GLO		1800.0
+#define	MAXTOE_SBS		360.0
+
+#define	TIMEGAP_GPS		7200.0
+#define	TIMEGAP_BDS		3600.0
+#define	TIMEGAP_GAL		600.0
+#define	TIMEGAP_GLO		1800.0
+
 #define MAXRINEX    4096    /* Max length of line of rinex file */
 #define MAXPATH     260     /* Max length of file path */
 

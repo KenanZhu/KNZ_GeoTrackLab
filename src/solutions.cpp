@@ -169,9 +169,8 @@ FILE* headerout(pobs_head obs_h, int mode,
     FILE* result_file = fopen(res_path, "a+");
     fprintf(result_file, ">GENERATE PROGRAM   : KNZ_GeoTrackLab ver%s\n", KNZ_GTL_VER);
     fprintf(result_file, " GENERATE SOURCE    : %.10s\n", obs_h->marker);
-
-    if (mode != 1); fprintf(result_file, " GENERATE TYPE      : Position Resolve\n");
-    if (mode == 0); fprintf(result_file, " GENERATE TYPE      : Satellite  Position\n");
+    if (mode == 0); fprintf(result_file, " GENERATE TYPE      : Position Resolve\n");
+    if (mode == 1); fprintf(result_file, " GENERATE TYPE      : Satellite Position\n");
     fprintf(result_file, " GENERATE TIME      : %s", ctime(&gen_time));
     fprintf(result_file, " OBS FILE PATH      : %s\n", obs_path);
     fprintf(result_file, " NAV FILE PATH      : %s\n", nav_path);
