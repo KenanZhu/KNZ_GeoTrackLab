@@ -1,4 +1,4 @@
-[中文](/READMECN.md)
+[中文](README.md)
 
 > [!WARNING]
 > You are browse a aborted repositories !
