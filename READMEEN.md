@@ -131,4 +131,6 @@ Update: 2024/09/20
 * (OINP): Operation in progress, or in urgent need of improvement.
 * (STOP): No longer update maintenance or consider implementing features.
   
-#### *This program code is solely for study and communication purposes* ####
+[!NOTE]
+> You are free to modify the core functionality and interface of this code.
+> No additional permissions are required. We waive all rights to these modifications.
